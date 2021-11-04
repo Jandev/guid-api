@@ -1,11 +1,11 @@
-# Project name
+# The new Guid API
 
-What is this about
+Solution meant to provide new guids whenever requested.
 
-# Set up
+Sure, this is also possible via the major search engines, by searching for `new guid` or something similar, but over there you need to select it in the UI before you can copy it.
 
-This is what you need to do to run it yourself
+This service only returns a new guid by invoking the site.
 
 # Sample usage
 
-See what it does
+GET https://guid.codes/
