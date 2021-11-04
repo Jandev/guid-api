@@ -1,12 +1,12 @@
 ﻿{
   "$schema": "http://json.schemastore.org/proxies",
   "proxies": {
-    "proxy1": {
+    "newguid": {
       "matchCondition": {
         "methods": [ "GET" ],
         "route": "/"
       },
-      "backendUri": "https://localhost/NewGuid"
+      "backendUri": "https://localhost/api/NewGuid"
     }
   }
 }
