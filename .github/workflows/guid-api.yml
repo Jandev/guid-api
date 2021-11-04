@@ -8,7 +8,7 @@ env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: Api/published
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 3.1.x
-  WORKING_DIRECTORY: Api/src
+  WORKING_DIRECTORY: src
   DOTNET_CORE_VERSION_INPROC: ""
 jobs:
   build-and-deploy:
