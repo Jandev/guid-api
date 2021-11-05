@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using System;
+using Microsoft.Extensions.Logging;
 
 namespace Api
 {
@@ -9,10 +10,13 @@ namespace Api
     {
         [FunctionName(nameof(NewGuid))]
         public static string Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", Route = "")] 
-            HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "GET")] 
+            HttpRequest req,
+            ILogger log)
         {
-            return Guid.NewGuid().ToString("D");
+            var guid = Guid.NewGuid().ToString("D");
+            log.LogInformation("Created guid `{0}`", guid);
+            return guid;
         }
     }
 }
