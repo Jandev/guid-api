@@ -85,10 +85,6 @@ resource config 'Microsoft.Web/sites/config@2020-12-01' = {
         name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
         value: webApiStorageAccount.outputs.connectionString
       }
-      {
-        name: 'WEBSITE_RUN_FROM_PACKAGE'
-        value: 1
-      }
     ]
   }
 }
