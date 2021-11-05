@@ -23,6 +23,7 @@ resource webApp 'Microsoft.Web/sites@2020-12-01' = {
     siteConfig: {
       ftpsState: 'Disabled'
       http20Enabled: true
+      linuxFxVersion: 'DOCKER|mcr.microsoft.com/azure-functions/dotnet:3.0.13130-appservice'
     }
   }
   identity: {
