@@ -21,7 +21,7 @@ param azureRegion string
 param skuName string = 'Standard_LRS'
 param storageAccountName string = '${systemName}${environmentName}${azureRegion}sa'
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2021-02-01' = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2021-06-01' = {
   name: storageAccountName
   kind: 'StorageV2'
   location: resourceGroup().location
@@ -31,3 +31,4 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-02-01' = {
 }
 
 output storageAccountName string = storageAccountName
+output connectionString string = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(storageAccount.id, storageAccount.apiVersion).keys[0].value}'

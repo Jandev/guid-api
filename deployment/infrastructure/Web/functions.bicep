@@ -9,18 +9,13 @@ param environmentName string
 param azureRegion string
 
 param appServicePlanId string
-@allowed([
-  'app'
-  'functionapp'
-])
-param kind string = 'app'
 
 var webAppName = toLower('${systemName}-${environmentName}-${azureRegion}-app')
 
 resource webApp 'Microsoft.Web/sites@2020-12-01' = {
   name: webAppName
   location: resourceGroup().location
-  kind: kind
+  kind: 'functionapp,linux'
   properties: {
     serverFarmId: appServicePlanId
     httpsOnly: true

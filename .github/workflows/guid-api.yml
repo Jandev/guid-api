@@ -4,7 +4,7 @@ on:
     branches:
       - main
 env:
-  AZURE_FUNCTIONAPP_NAME: guid-api
+  AZURE_FUNCTIONAPP_NAME: guidapi-prod-weu-app
   AZURE_FUNCTIONAPP_PACKAGE_PATH: Api/published
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 3.1.x

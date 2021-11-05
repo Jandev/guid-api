@@ -8,25 +8,22 @@ param systemName string
 param environmentName string
 param azureRegion string
 
-@allowed([
-  'functionapp'
-  'linux'
-  'app'
-])
 param kind string = 'app'
 
 param sku object = {
-  name: 'Y'
+  name: 'Y1'
+  tier: 'Dynamic'
 }
 
 var servicePlanName = toLower('${systemName}-${environmentName}-${azureRegion}-plan')
 
-resource appFarm 'Microsoft.Web/serverfarms@2020-12-01' = {
+resource appFarm 'Microsoft.Web/serverfarms@2021-02-01' = {
   name: servicePlanName
   location: resourceGroup().location
   kind: kind
-  sku: {
-    name: sku.name
+  sku: sku
+  properties: {
+    reserved: true
   }
 }
 
