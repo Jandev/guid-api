@@ -23,7 +23,7 @@ param storageAccountName string = '${systemName}${environmentName}${azureRegion}
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-06-01' = {
   name: storageAccountName
-  kind: 'StorageV2'
+  kind: 'Storage'
   location: resourceGroup().location
   sku: {
     name: skuName
