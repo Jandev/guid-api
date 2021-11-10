@@ -4,7 +4,10 @@ on:
     branches:
       - main
 env:
-  AZURE_FUNCTIONAPP_NAME: guidapi-prod-weu-app
+  AZURE_FUNCTIONAPP_NAME_WEU: guidapi-prod-weu-app
+  AZURE_RESOURCEGROUP_NAME_WEU: guidapi-prod-weu
+  AZURE_RESOURCEGROUP_NAME_US1: guidapi-prod-eus
+  AZURE_RESOURCEGROUP_NAME_AU1: guidapi-prod-aus
   AZURE_FUNCTIONAPP_PACKAGE_PATH: "."
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 3.1.x
@@ -26,18 +29,110 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_CORE_VERSION_INPROC }}
 
-      - name: Restore
+      - name: Dotnet restore
         run: dotnet restore "${{ env.WORKING_DIRECTORY }}"
 
-      - name: Build
+      - name: Dotnet build
         run: dotnet build "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-restore
 
-      - name: Publish
+      - name: Dotnet publish
         run: dotnet publish "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output"
 
-      - name: Deploy to Azure Function App
-        uses: Azure/functions-action@v1
+      - name: Publish Functions artifact
+        uses: actions/upload-artifact@v2
         with:
-          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-          package: "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output"
-          publish-profile: ${{ secrets.GUID_API_FFFF }}
+          name: functions-artifact
+          path: artifact.zip
+
+  publish-bicep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: bicep-templates
+          path: deployment/infrastructure/
+
+  infrastructure-incremental-dev:
+    needs: publish-bicep
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: bicep-templates
+          path: ./infrastructure
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_DEV }}
+      - name: Azure Create Resource Group - West Europe
+        uses: Azure/cli@1.0.4
+        with:
+          azcliversion: 2.23.0
+          inlineScript: az group create -l westeurope -n ${{ env.AZURE_RESOURCEGROUP_NAME_WEU }}
+      - name: Azure Create Resource Group - US 1
+        uses: Azure/cli@1.0.4
+        with:
+          azcliversion: 2.23.0
+          inlineScript: az group create -l westus -n ${{ env.AZURE_RESOURCEGROUP_NAME_US1 }}
+      - name: Azure Create Resource Group - Australia 1
+        uses: Azure/cli@1.0.4
+        with:
+          azcliversion: 2.23.0
+          inlineScript: az group create -l australiacentral -n ${{ env.AZURE_RESOURCEGROUP_NAME_AU1 }}
+
+      - name: Deploy Infrastructure - West Europe
+        id: arm
+        uses: Azure/cli@1.0.4
+        with:
+          azcliversion: 2.23.0
+          inlineScript: az deployment group create --resource-group ${{ env.AZURE_RESOURCEGROUP_NAME_WEU }} --template-file ./infrastructure/main.bicep --parameters parameters-weu.json --mode Incremental
+      - name: Deploy Infrastructure - US 1
+        id: arm
+        uses: Azure/cli@1.0.4
+        with:
+          azcliversion: 2.23.0
+          inlineScript: az deployment group create --resource-group ${{ env.AZURE_RESOURCEGROUP_NAME_US1 }} --template-file ./infrastructure/main.bicep --parameters parameters-us1.json --mode Incremental
+      - name: Deploy Infrastructure - Australia 1
+        id: arm
+        uses: Azure/cli@1.0.4
+        with:
+          azcliversion: 2.23.0
+          inlineScript: az deployment group create --resource-group ${{ env.AZURE_RESOURCEGROUP_NAME_AU1 }} --template-file ./infrastructure/main.bicep --parameters parameters-au1.json --mode Incremental
+
+  deploy-functions-dev:
+    needs: [compile-functions-app, infrastructure-incremental-dev]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: functions-artifact
+      - name: Get FunctionApp publish profile
+        id: publishprofile
+        uses: aliencube/publish-profile-actions@v1
+        env:
+          AZURE_CREDENTIALS: ${{ secrets.AZURE_DEV }}
+        with:
+          resourceGroupName: ${{ env.AZURE_RESOURCEGROUP_NAME_WEU }}
+          appName: "{{ env.AZURE_FUNCTIONAPP_NAME_WEU }}"
+      - name: "Deploy web app - WEU"
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: "{{ env.AZURE_FUNCTIONAPP_NAME_WEU }}"
+          publish-profile: ${{ steps.publishprofile.outputs.profile }}
+          package: "artifact.zip"
+      - name: "Deploy web app - US1"
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: "{{ env.AZURE_FUNCTIONAPP_NAME_US1 }}"
+          publish-profile: ${{ steps.publishprofile.outputs.profile }}
+          package: "artifact.zip"
+      - name: "Deploy web app - AU1"
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: "{{ env.AZURE_FUNCTIONAPP_NAME_AU1 }}"
+          publish-profile: ${{ steps.publishprofile.outputs.profile }}
+          package: "artifact.zip"
