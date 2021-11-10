@@ -38,6 +38,13 @@ jobs:
       - name: Dotnet publish
         run: dotnet publish "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output"
 
+      - name: "Zip published content"
+        uses: papeloto/action-zip@v1
+        with:
+          files: ./output/
+          recursive: true
+          dest: artifact.zip
+
       - name: Publish Functions artifact
         uses: actions/upload-artifact@v2
         with:
