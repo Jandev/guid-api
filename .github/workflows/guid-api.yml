@@ -111,6 +111,11 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: functions-artifact
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_DEV }}
+
       - name: Get FunctionApp publish profile
         id: publishprofile
         uses: aliencube/publish-profile-actions@v1
