@@ -4,8 +4,10 @@ on:
     branches:
       - main
 env:
-  AZURE_FUNCTIONAPP_NAME_WEU: guidapi-prod-weu-app
-  AZURE_RESOURCEGROUP_NAME_WEU: guidapi-prod-weu
+  AZURE_FUNCTIONAPP_NAME_EU1: guidapi-prod-weu-app
+  AZURE_FUNCTIONAPP_NAME_US1: guidapi-prod-usone-app
+  AZURE_FUNCTIONAPP_NAME_AU1: guidapi-prod-auone-app
+  AZURE_RESOURCEGROUP_NAME_EU1: guidapi-prod-weu
   AZURE_RESOURCEGROUP_NAME_US1: guidapi-prod-eus
   AZURE_RESOURCEGROUP_NAME_AU1: guidapi-prod-aus
   AZURE_FUNCTIONAPP_PACKAGE_PATH: "."
@@ -77,7 +79,7 @@ jobs:
       - name: Azure Create Resource Group - West Europe
         uses: Azure/cli@1.0.4
         with:
-          inlineScript: az group create -l westeurope -n ${{ env.AZURE_RESOURCEGROUP_NAME_WEU }}
+          inlineScript: az group create -l westeurope -n ${{ env.AZURE_RESOURCEGROUP_NAME_EU1 }}
       - name: Azure Create Resource Group - US 1
         uses: Azure/cli@1.0.4
         with:
@@ -91,7 +93,7 @@ jobs:
         id: deployweu
         uses: Azure/cli@1.0.4
         with:
-          inlineScript: az deployment group create --resource-group ${{ env.AZURE_RESOURCEGROUP_NAME_WEU }} --template-file ./infrastructure/main.bicep --parameters ./infrastructure/parameters-weu.json --mode Incremental
+          inlineScript: az deployment group create --resource-group ${{ env.AZURE_RESOURCEGROUP_NAME_EU1 }} --template-file ./infrastructure/main.bicep --parameters ./infrastructure/parameters-eu1.json --mode Incremental
       - name: Deploy Infrastructure - US 1
         id: deployus1
         uses: Azure/cli@1.0.4
@@ -116,10 +118,10 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_DEV }}
 
-      - name: "Deploy web app - WEU"
+      - name: "Deploy web app - EU1"
         uses: Azure/functions-action@v1
         with:
-          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME_WEU }}
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME_EU1 }}
           package: "artifact.zip"
 
       - name: "Deploy web app - US1"
