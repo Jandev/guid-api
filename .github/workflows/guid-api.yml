@@ -84,19 +84,19 @@ jobs:
           inlineScript: az group create -l australiacentral -n ${{ env.AZURE_RESOURCEGROUP_NAME_AU1 }}
 
       - name: Deploy Infrastructure - West Europe
-        id: arm
+        id: deployweu
         uses: Azure/cli@1.0.4
         with:
           azcliversion: 2.23.0
           inlineScript: az deployment group create --resource-group ${{ env.AZURE_RESOURCEGROUP_NAME_WEU }} --template-file ./infrastructure/main.bicep --parameters parameters-weu.json --mode Incremental
       - name: Deploy Infrastructure - US 1
-        id: arm
+        id: deployus1
         uses: Azure/cli@1.0.4
         with:
           azcliversion: 2.23.0
           inlineScript: az deployment group create --resource-group ${{ env.AZURE_RESOURCEGROUP_NAME_US1 }} --template-file ./infrastructure/main.bicep --parameters parameters-us1.json --mode Incremental
       - name: Deploy Infrastructure - Australia 1
-        id: arm
+        id: deployau1
         uses: Azure/cli@1.0.4
         with:
           azcliversion: 2.23.0
