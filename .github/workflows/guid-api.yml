@@ -78,7 +78,7 @@ jobs:
       - name: Azure Create Resource Group - Australia 1
         uses: Azure/cli@1.0.4
         with:
-          inlineScript: az group create -l australiacentral -n ${{ env.AZURE_RESOURCEGROUP_NAME_AU1 }}
+          inlineScript: az group create -l australiasoutheast -n ${{ env.AZURE_RESOURCEGROUP_NAME_AU1 }}
 
       - name: Deploy Infrastructure - West Europe
         id: deployweu
