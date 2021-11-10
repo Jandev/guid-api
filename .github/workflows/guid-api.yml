@@ -70,36 +70,30 @@ jobs:
       - name: Azure Create Resource Group - West Europe
         uses: Azure/cli@1.0.4
         with:
-          azcliversion: 2.23.0
           inlineScript: az group create -l westeurope -n ${{ env.AZURE_RESOURCEGROUP_NAME_WEU }}
       - name: Azure Create Resource Group - US 1
         uses: Azure/cli@1.0.4
         with:
-          azcliversion: 2.23.0
           inlineScript: az group create -l westus -n ${{ env.AZURE_RESOURCEGROUP_NAME_US1 }}
       - name: Azure Create Resource Group - Australia 1
         uses: Azure/cli@1.0.4
         with:
-          azcliversion: 2.23.0
           inlineScript: az group create -l australiacentral -n ${{ env.AZURE_RESOURCEGROUP_NAME_AU1 }}
 
       - name: Deploy Infrastructure - West Europe
         id: deployweu
         uses: Azure/cli@1.0.4
         with:
-          azcliversion: 2.23.0
           inlineScript: az deployment group create --resource-group ${{ env.AZURE_RESOURCEGROUP_NAME_WEU }} --template-file ./infrastructure/main.bicep --parameters parameters-weu.json --mode Incremental
       - name: Deploy Infrastructure - US 1
         id: deployus1
         uses: Azure/cli@1.0.4
         with:
-          azcliversion: 2.23.0
           inlineScript: az deployment group create --resource-group ${{ env.AZURE_RESOURCEGROUP_NAME_US1 }} --template-file ./infrastructure/main.bicep --parameters parameters-us1.json --mode Incremental
       - name: Deploy Infrastructure - Australia 1
         id: deployau1
         uses: Azure/cli@1.0.4
         with:
-          azcliversion: 2.23.0
           inlineScript: az deployment group create --resource-group ${{ env.AZURE_RESOURCEGROUP_NAME_AU1 }} --template-file ./infrastructure/main.bicep --parameters parameters-au1.json --mode Incremental
 
   deploy-functions-dev:
