@@ -8,9 +8,9 @@ namespace Api
 {
     public static class NewGuid
     {
-        [FunctionName(nameof(NewGuid))]
+        [FunctionName("DefaultNewGuid")]
         public static string Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "GET")] 
+            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", Route = null)] 
             HttpRequest req,
             ILogger log)
         {

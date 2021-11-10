@@ -6,7 +6,7 @@
         "methods": [ "GET" ],
         "route": "/"
       },
-      "backendUri": "https://localhost/api/NewGuid"
+      "backendUri": "https://localhost/api/DefaultNewGuid"
     }
   }
 }
