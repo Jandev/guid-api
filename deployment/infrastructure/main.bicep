@@ -88,3 +88,17 @@ resource config 'Microsoft.Web/sites/config@2020-12-01' = {
     ]
   }
 }
+
+module trafficManagerProfile 'Network/trafficManagerProfiles.bicep' = {
+  name: 'trafficManagerProfileModule'
+  dependsOn: [
+    functionAppModule
+  ]
+  params: {
+    environmentName: environmentName
+    systemName: systemName
+    webAppNameToAdd: functionAppModule.outputs.webAppName
+    webAppResourceGroupName: resourceGroup().name
+  }
+  scope: resourceGroup('${systemName}-${environmentName}-infra')
+}
