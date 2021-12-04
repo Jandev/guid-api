@@ -4,9 +4,6 @@
   "parameters": {
     "environmentName": {
       "value": "prod"
-    },
-    "azureRegion": {
-      "value": "weu"
     }
   }
 }
