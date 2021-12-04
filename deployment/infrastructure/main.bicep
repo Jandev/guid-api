@@ -1,4 +1,3 @@
-var systemName = 'guidapi'
 @allowed([
   'dev'
   'test'
@@ -6,85 +5,56 @@ var systemName = 'guidapi'
   'prod'
 ])
 param environmentName string = 'prod'
-param azureRegion string = 'weu'
 
-var webAppName = '${systemName}-${environmentName}-${azureRegion}-app'
+var systemName = 'guidapi'
+var fullSystemPrefix = '${systemName}-${environmentName}'
+var regionWestEuropeName = 'weu'
+var regionWestUsName = 'wus'
+var regionAustraliaSouthEastName = 'aus'
 
-module  webApiStorageAccount 'Storage/storageAccounts.bicep' = {
-  name: 'storageAccountAppDeploy'
-  params: {
-    environmentName: environmentName
-    systemName: systemName
-    azureRegion: azureRegion
-  }
+targetScope = 'subscription'
+
+resource rgWestEurope 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+  name: '${fullSystemPrefix}-${regionWestEuropeName}'
+  location: 'westeurope'
 }
 
-module applicationInsights 'Insights/components.bicep' = {
-  name: 'applicationInsightsDeploy'
-  params: {
-    environmentName: environmentName
-    systemName: systemName
-    azureRegion: azureRegion
-  }
+resource rgWestUs 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+  name: '${fullSystemPrefix}-${regionWestUsName}'
+  location: 'westus'
 }
 
-module appServicePlanModule 'Web/serverfarms.bicep' = {
-  dependsOn: [
-  ]
-  name: 'appServicePlanModule'
-  params: {
-    environmentName: environmentName
-    systemName: systemName
-    azureRegion: azureRegion
-    kind: 'linux'
-  }
+resource rgAustraliaSouthEast 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+  name: '${fullSystemPrefix}-${regionAustraliaSouthEastName}'
+  location: 'australiasoutheast'
 }
 
-module functionAppModule 'Web/functions.bicep' = {
-  dependsOn: [
-    appServicePlanModule
-    webApiStorageAccount
-  ]
-  name: 'functionAppModule'
+module applicationWestEurope 'application-infrastructure.bicep' = {
+  name: 'guidApiWestEurope'
   params: {
+    azureRegion: regionWestEuropeName
     environmentName: environmentName
     systemName: systemName
-    azureRegion: azureRegion
-    appServicePlanId: appServicePlanModule.outputs.id
   }
+  scope: rgWestEurope
 }
 
-resource config 'Microsoft.Web/sites/config@2020-12-01' = {
-  dependsOn: [
-    functionAppModule
-  ]
-  name: '${webAppName}/web'
-  properties: {
-    appSettings: [
-      {
-        name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-        value: applicationInsights.outputs.instrumentationKey
-      }
-      {
-        name: 'FUNCTIONS_EXTENSION_VERSION'
-        value: '~3'
-      }
-      {
-        name: 'FUNCTIONS_WORKER_RUNTIME'
-        value: 'dotnet'
-      }
-      {
-        name: 'WEBSITE_CONTENTSHARE'
-        value: 'azure-function'
-      }
-      {
-        name: 'AzureWebJobsStorage'
-        value: webApiStorageAccount.outputs.connectionString
-      }
-      {
-        name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-        value: webApiStorageAccount.outputs.connectionString
-      }
-    ]
+module applicationWestUs 'application-infrastructure.bicep' = {
+  name: 'guidApiWestUs'
+  params: {
+    azureRegion: regionWestUsName
+    environmentName: environmentName
+    systemName: systemName
   }
+  scope: rgWestUs
+}
+
+module applicationAustraliaSouthEast 'application-infrastructure.bicep' = {
+  name: 'guidApiAustraliaSouthEast'
+  params: {
+    azureRegion: regionAustraliaSouthEastName
+    environmentName: environmentName
+    systemName: systemName
+  }
+  scope: rgAustraliaSouthEast
 }
