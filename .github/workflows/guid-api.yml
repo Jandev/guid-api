@@ -76,34 +76,12 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_DEV }}
-      - name: Azure Create Resource Group - West Europe
-        uses: Azure/cli@1.0.4
-        with:
-          inlineScript: az group create -l westeurope -n ${{ env.AZURE_RESOURCEGROUP_NAME_EU1 }}
-      - name: Azure Create Resource Group - US 1
-        uses: Azure/cli@1.0.4
-        with:
-          inlineScript: az group create -l westus -n ${{ env.AZURE_RESOURCEGROUP_NAME_US1 }}
-      - name: Azure Create Resource Group - Australia 1
-        uses: Azure/cli@1.0.4
-        with:
-          inlineScript: az group create -l australiasoutheast -n ${{ env.AZURE_RESOURCEGROUP_NAME_AU1 }}
 
-      - name: Deploy Infrastructure - West Europe
-        id: deployweu
+      - name: Deploy Infrastructure
+        id: deployinfrastructure
         uses: Azure/cli@1.0.4
         with:
-          inlineScript: az deployment group create --resource-group ${{ env.AZURE_RESOURCEGROUP_NAME_EU1 }} --template-file ./infrastructure/main.bicep --parameters ./infrastructure/parameters-eu1.json --mode Incremental
-      - name: Deploy Infrastructure - US 1
-        id: deployus1
-        uses: Azure/cli@1.0.4
-        with:
-          inlineScript: az deployment group create --resource-group ${{ env.AZURE_RESOURCEGROUP_NAME_US1 }} --template-file ./infrastructure/main.bicep --parameters ./infrastructure/parameters-us1.json --mode Incremental
-      - name: Deploy Infrastructure - Australia 1
-        id: deployau1
-        uses: Azure/cli@1.0.4
-        with:
-          inlineScript: az deployment group create --resource-group ${{ env.AZURE_RESOURCEGROUP_NAME_AU1 }} --template-file ./infrastructure/main.bicep --parameters ./infrastructure/parameters-au1.json --mode Incremental
+          inlineScript: az deployment sub create --location WestEurope --template-file ./infrastructure/main.bicep --parameters ./infrastructure/parameters.json --mode Incremental
 
   deploy-functions-dev:
     needs: [compile-functions-app, infrastructure-incremental-dev]
