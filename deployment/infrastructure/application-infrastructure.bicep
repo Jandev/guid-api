@@ -91,5 +91,5 @@ resource config 'Microsoft.Web/sites/config@2020-12-01' = {
   }
 }
 
-output webApplicationName string = functionAppModule.name
+output webApplicationName string = functionAppModule.outputs.webAppName
 output resourceGroupLocation string = resourceGroup().location

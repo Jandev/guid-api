@@ -14,6 +14,11 @@ var regionAustraliaSouthEastName = 'aus'
 
 targetScope = 'subscription'
 
+resource rgInfrastructure 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+  name: '${fullSystemPrefix}-infra'
+  location: 'westeurope'
+}
+
 resource rgWestEurope 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: '${fullSystemPrefix}-${regionWestEuropeName}'
   location: 'westeurope'
@@ -62,13 +67,27 @@ module applicationAustraliaSouthEast 'application-infrastructure.bicep' = {
 module trafficManagerProfile 'Network/trafficManagerProfiles.bicep' = {
   name: 'trafficManagerProfileModule'
   dependsOn: [
-    functionAppModule
+    applicationAustraliaSouthEast
+    applicationWestEurope
+    applicationWestUs
   ]
   params: {
     environmentName: environmentName
     systemName: systemName
-    webAppNameToAdd: functionAppModule.outputs.webAppName
-    webAppResourceGroupName: resourceGroup().name
+    webAppEndpoints: [
+      {
+        webAppNameToAdd: applicationAustraliaSouthEast.outputs.webApplicationName
+        webAppResourceGroupName: rgAustraliaSouthEast.name
+      }
+      {
+        webAppNameToAdd: applicationWestEurope.outputs.webApplicationName
+        webAppResourceGroupName: rgWestEurope.name
+      }
+      {
+        webAppNameToAdd: applicationWestUs.outputs.webApplicationName
+        webAppResourceGroupName: rgWestUs.name
+      }
+    ]
   }
-  scope: resourceGroup('${systemName}-${environmentName}-infra')
+  scope: rgInfrastructure
 }

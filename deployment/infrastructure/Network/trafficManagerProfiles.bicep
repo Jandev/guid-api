@@ -7,15 +7,14 @@ param systemName string
 ])
 param environmentName string
 param relativeLiveEndpoint string = '/api/Live'
-param webAppNameToAdd string
-param webAppResourceGroupName string
+param webAppEndpoints array
 
-var trafficManagerProfileName = '${systemName}${environmentName}'
+var trafficManagerProfileName = '${systemName}-${environmentName}'
 
-resource webAppResource 'Microsoft.Web/sites@2021-02-01' existing = {
-  name: webAppNameToAdd
-  scope: resourceGroup(webAppResourceGroupName)
-}
+resource webAppResources 'Microsoft.Web/sites@2021-02-01' existing = [for i in webAppEndpoints: {
+  name: i.webAppNameToAdd
+  scope: resourceGroup(i.webAppResourceGroupName)
+}]
 
 
 resource trafficManagerProfile 'Microsoft.Network/trafficmanagerprofiles@2018-08-01' = {
@@ -37,21 +36,19 @@ resource trafficManagerProfile 'Microsoft.Network/trafficmanagerprofiles@2018-08
       intervalInSeconds: 30
       toleratedNumberOfFailures: 3
     }
-    endpoints: [
-      {
-        id: '${resourceId('Microsoft.Network/trafficmanagerprofiles', trafficManagerProfileName)}/azureEndpoints/${webAppResource.name}'
-        name: webAppResource.name
+    endpoints: [for (webAppEndpoint, index) in webAppEndpoints: {
+        id: '${resourceId('Microsoft.Network/trafficmanagerprofiles', trafficManagerProfileName)}/azureEndpoints/${webAppResources[index].name}'
+        name: webAppResources[index].name
         type: 'Microsoft.Network/trafficManagerProfiles/azureEndpoints'
         properties: {
           endpointStatus: 'Enabled'
           endpointMonitorStatus: 'Online'
-          targetResourceId: webAppResource.id
-          target: webAppResource.properties.hostNames[0]
-          endpointLocation: webAppResource.location
+          targetResourceId: webAppResources[index].id
+          target: webAppResources[index].properties.hostNames[0]
+          endpointLocation: webAppResources[index].location
           weight: 1
-          priority: 1
+          priority: index + 1
         }
-      }
-    ]
+      }]
   }
 }
