@@ -58,3 +58,17 @@ module applicationAustraliaSouthEast 'application-infrastructure.bicep' = {
   }
   scope: rgAustraliaSouthEast
 }
+
+module trafficManagerProfile 'Network/trafficManagerProfiles.bicep' = {
+  name: 'trafficManagerProfileModule'
+  dependsOn: [
+    functionAppModule
+  ]
+  params: {
+    environmentName: environmentName
+    systemName: systemName
+    webAppNameToAdd: functionAppModule.outputs.webAppName
+    webAppResourceGroupName: resourceGroup().name
+  }
+  scope: resourceGroup('${systemName}-${environmentName}-infra')
+}
