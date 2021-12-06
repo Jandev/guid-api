@@ -80,6 +80,10 @@ resource config 'Microsoft.Web/sites/config@2020-12-01' = {
         value: 'azure-function'
       }
       {
+        name: 'WEBSITE_RUN_FROM_PACKAGE'
+        value: '1'
+      }
+      {
         name: 'AzureWebJobsStorage'
         value: webApiStorageAccount.outputs.connectionString
       }
