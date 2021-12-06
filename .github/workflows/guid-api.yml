@@ -5,10 +5,10 @@ on:
       - main
 env:
   AZURE_FUNCTIONAPP_NAME_EU1: guidapi-prod-weu-app
-  AZURE_FUNCTIONAPP_NAME_US1: guidapi-prod-usone-app
-  AZURE_FUNCTIONAPP_NAME_AU1: guidapi-prod-ausone-app
+  AZURE_FUNCTIONAPP_NAME_US1: guidapi-prod-wus-app
+  AZURE_FUNCTIONAPP_NAME_AU1: guidapi-prod-aus-app
   AZURE_RESOURCEGROUP_NAME_EU1: guidapi-prod-weu
-  AZURE_RESOURCEGROUP_NAME_US1: guidapi-prod-eus
+  AZURE_RESOURCEGROUP_NAME_US1: guidapi-prod-wus
   AZURE_RESOURCEGROUP_NAME_AU1: guidapi-prod-aus
   AZURE_FUNCTIONAPP_PACKAGE_PATH: "."
   CONFIGURATION: Release
