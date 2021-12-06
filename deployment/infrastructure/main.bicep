@@ -78,14 +78,17 @@ module trafficManagerProfile 'Network/trafficManagerProfiles.bicep' = {
       {
         webAppNameToAdd: applicationAustraliaSouthEast.outputs.webApplicationName
         webAppResourceGroupName: rgAustraliaSouthEast.name
+        priority: 1
       }
       {
         webAppNameToAdd: applicationWestEurope.outputs.webApplicationName
         webAppResourceGroupName: rgWestEurope.name
+        priority: 2
       }
       {
         webAppNameToAdd: applicationWestUs.outputs.webApplicationName
         webAppResourceGroupName: rgWestUs.name
+        priority: 3
       }
     ]
   }

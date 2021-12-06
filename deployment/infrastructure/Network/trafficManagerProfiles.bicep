@@ -44,10 +44,10 @@ resource trafficManagerProfile 'Microsoft.Network/trafficmanagerprofiles@2018-08
           endpointStatus: 'Enabled'
           endpointMonitorStatus: 'Online'
           targetResourceId: webAppResources[index].id
-          target: webAppResources[index].properties.hostNames[0]
+          target: 'https://${webAppResources[index].name}.azurewebsites.net/'
           endpointLocation: webAppResources[index].location
           weight: 1
-          priority: index + 1
+          priority: webAppEndpoint.priority
         }
       }]
   }
