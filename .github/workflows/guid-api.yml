@@ -11,6 +11,7 @@ env:
   AZURE_RESOURCEGROUP_NAME_US1: guidapi-prod-wus
   AZURE_RESOURCEGROUP_NAME_AU1: guidapi-prod-aus
   AZURE_FUNCTIONAPP_PACKAGE_PATH: "."
+  AZURE_STATIC_SITE_STORAGE_ACCOUNT: "https://guidapistaticprodweu.blob.core.windows.net/$web/"
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 3.1.x
   WORKING_DIRECTORY: src
@@ -113,3 +114,15 @@ jobs:
         with:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME_AU1 }}
           package: "artifact.zip"
+
+  deploy-static-site:
+    needs: [infrastructure-incremental-dev]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install azcopy
+        uses: kheiakiyama/install-azcopy-action@v1.0.3
+        with:
+          version: "v10"
+          creds: ${{ secrets.AZURE_DEV }}
+      - run: azcopy_v10 --source ./content/about/* --destination ${{ env.AZURE_STATIC_SITE_STORAGE_ACCOUNT }} --dest-key ${{ secrets.STORAGE_KEY }} --recursive
