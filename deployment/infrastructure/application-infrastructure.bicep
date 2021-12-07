@@ -12,7 +12,7 @@ var webAppName = '${systemName}-${environmentName}-${azureRegion}-app'
 
 targetScope = 'resourceGroup'
 
-module  webApiStorageAccount 'Storage/storageAccounts.bicep' = {
+module webApiStorageAccount 'Storage/storageAccounts.bicep' = {
   name: 'storageAccountAppDeploy'
   params: {
     environmentName: environmentName
@@ -31,8 +31,6 @@ module applicationInsights 'Insights/components.bicep' = {
 }
 
 module appServicePlanModule 'Web/serverfarms.bicep' = {
-  dependsOn: [
-  ]
   name: 'appServicePlanModule'
   params: {
     environmentName: environmentName
@@ -62,6 +60,12 @@ resource config 'Microsoft.Web/sites/config@2020-12-01' = {
   ]
   name: '${webAppName}/web'
   properties: {
+    cors: {
+      allowedOrigins: [
+        'http://localhost:4200'
+        'https://guid.codes'
+      ]
+    }
     appSettings: [
       {
         name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
