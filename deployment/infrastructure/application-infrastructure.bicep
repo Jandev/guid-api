@@ -31,7 +31,6 @@ module applicationInsights 'Insights/components.bicep' = {
 }
 
 module appServicePlanModule 'Web/serverfarms.bicep' = {
-  dependsOn: []
   name: 'appServicePlanModule'
   params: {
     environmentName: environmentName
