@@ -1,0 +1,70 @@
+.default-page {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+  .default-panel {
+    width: 80%;
+    .header {
+      text-align: center;
+      h3 {
+        font-size: 3rem;
+        color: rgba($color: #fff, $alpha: 0.5);
+      }
+      h1 {
+        font-size: 5rem;
+        font-weight: 100;
+      }
+    }
+    .content {
+      text-align: center;
+      .full-width {
+        width: 100%;
+      }
+
+      .error {
+        text-align: center;
+        color: #f66;
+      }
+    }
+    .footer {
+      text-align: center;
+      p {
+        font-size: 0.7rem;
+      }
+    }
+  }
+}
+.mat-icon {
+  cursor: pointer;
+}
+@media (max-width: 480px) {
+  .default-page {
+    .default-panel {
+      width: 100%;
+    }
+  }
+}
+@media only screen and (min-width: 800px) {
+  .default-page {
+    .default-panel {
+      width: 60%;
+    }
+  }
+}
+@media only screen and (min-width: 1200px) {
+  .default-page {
+    .default-panel {
+      width: 40%;
+    }
+  }
+}
+@media only screen and (min-width: 1824px) {
+  .default-page {
+    .default-panel {
+      width: 30%;
+    }
+  }
+}

@@ -1,0 +1,34 @@
+<div class="default-page">
+  <div class="default-panel">
+    <div class="header">
+      <h3>What do we want?</h3>
+      <h1>More GUIDs!</h1>
+    </div>
+    <div class="content">
+      <form class="guid-form" *ngIf="latestGuid">
+        <mat-form-field class="full-width" appearance="fill">
+          <mat-label>Guid</mat-label>
+          <input type="guid" matInput [value]="latestGuid" />
+          <mat-icon
+            matSuffix
+            [cdkCopyToClipboard]="latestGuid"
+            matTooltip="Copy this GUID to your clipboard"
+            >content_copy</mat-icon
+          >
+        </mat-form-field>
+      </form>
+      <div class="error" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+    </div>
+    <div class="footer">
+      <p>Powered by Jan de Vries</p>
+      <mat-icon
+        matSuffix
+        (click)="refreshGuid()"
+        matTooltip="Refresh the GUID to get even more!"
+        >refresh</mat-icon
+      >
+    </div>
+  </div>
+</div>

@@ -1,0 +1,91 @@
+@use "@angular/material" as mat;
+
+$custom-typography: mat.define-typography-config(
+  $font-family: "Montserrat",
+  $display-4: mat.define-typography-level(112px, 112px, 300),
+  $display-3: mat.define-typography-level(56px, 56px, 400),
+  $display-2: mat.define-typography-level(45px, 48px, 400),
+  $display-1: mat.define-typography-level(34px, 40px, 400),
+  $headline: mat.define-typography-level(64px, 64px, 100),
+  $title: mat.define-typography-level(20px, 32px, 500),
+  $subheading-2: mat.define-typography-level(16px, 28px, 400),
+  $subheading-1: mat.define-typography-level(15px, 24px, 400),
+  $body-2: mat.define-typography-level(14px, 24px, 500),
+  $body-1: mat.define-typography-level(14px, 20px, 400),
+  $caption: mat.define-typography-level(12px, 20px, 400),
+  $button: mat.define-typography-level(14px, 14px, 500),
+  $input: mat.define-typography-level(inherit, 1.125, 400),
+);
+
+@include mat.core($custom-typography);
+@include mat.strong-focus-indicators(
+  (
+    border-style: dotted,
+    border-width: 4px,
+    border-radius: 2px,
+  )
+);
+
+$fourdotnet-blue: (
+  50: #c0c1ef,
+  100: #8f91e4,
+  200: #6f72da,
+  300: #5054d0,
+  400: #363ac0,
+  500: #1e22aa,
+  600: #161991,
+  700: #0e1172,
+  800: #080a51,
+  900: #02042d,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: white,
+    400: white,
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+  ),
+);
+$fourdotnet-pink: (
+  50: #f2b0ce,
+  100: #ef83b4,
+  200: #ec6aa4,
+  300: #e5428b,
+  400: #dd2478,
+  500: #d50965,
+  600: #b20754,
+  700: #920746,
+  800: #6e0434,
+  900: #4b0323,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: white,
+    400: white,
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+  ),
+);
+
+$my-primary: mat.define-palette($fourdotnet-blue, 500);
+$my-accent: mat.define-palette($fourdotnet-pink, 500);
+
+$fourdotnet-theme: mat.define-dark-theme(
+  (
+    color: (
+      primary: $my-primary,
+      accent: $my-accent,
+    ),
+  )
+);
+
+@include mat.all-component-themes($fourdotnet-theme);
+@include mat.strong-focus-indicators-theme(purple);
