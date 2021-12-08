@@ -54,9 +54,9 @@ jobs:
         uses: azure/CLI@v1
         with:
           inlineScript: |
-            az storage blob service-properties update --account-name ${{ AZURE_STORAGE_ACCOUNT_NAME }} --static-website --index-document index.html --404-document 404.html
+            az storage blob service-properties update --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME }} --static-website --index-document index.html --404-document 404.html
       - name: Upload to blob storage
         uses: azure/CLI@v1
         with:
           inlineScript: |
-            az storage blob upload-batch --account-name ${{ AZURE_STORAGE_ACCOUNT_NAME }} --auth-mode key -d '$web' -s ${{ STATIC_FILES_WORKING_DIRECTORY }}
+            az storage blob upload-batch --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME }} --auth-mode key -d '$web' -s ${{ env.STATIC_FILES_WORKING_DIRECTORY }}
