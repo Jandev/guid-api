@@ -1,4 +1,4 @@
-name: Build and deploy .NET Core application to Function App guid-api
+name: Deploy static site
 on:
   push:
     branches:
