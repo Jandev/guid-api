@@ -64,7 +64,7 @@ jobs:
           name: bicep-templates
           path: deployment/infrastructure/
 
-  infrastructure-incremental-dev:
+  infrastructure-incremental:
     needs: publish-bicep
     runs-on: ubuntu-latest
     steps:
@@ -85,7 +85,7 @@ jobs:
           inlineScript: az deployment sub create --location WestEurope --template-file ./infrastructure/main.bicep --parameters ./infrastructure/parameters.json
 
   deploy-functions-dev:
-    needs: [compile-functions-app, infrastructure-incremental-dev]
+    needs: [compile-functions-app, infrastructure-incremental]
     runs-on: ubuntu-latest
     steps:
       - name: Download Artifact
@@ -114,21 +114,3 @@ jobs:
         with:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME_AU1 }}
           package: "artifact.zip"
-
-  deploy-static-site:
-    needs: [infrastructure-incremental-dev]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_DEV }}
-      - name: Configure static site hosting
-        run: az storage blob service-properties update --account-name guidapistaticprodweu --static-website --index-document index.html --404-document 404.html
-      - name: Install azcopy
-        uses: kheiakiyama/install-azcopy-action@v1.0.3
-        with:
-          version: "v10"
-          creds: ${{ secrets.AZURE_DEV }}
-      - run: azcopy_v10 --source ./content/about/* --destination "https://${{ env.AZURE_STATIC_SITE_STORAGE_ACCOUNT }}/$web" --dest-key ${{ secrets.STORAGE_KEY }} --recursive

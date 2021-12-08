@@ -1,0 +1,62 @@
+name: Build and deploy .NET Core application to Function App guid-api
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - src/static-site/**
+
+env:
+  AZURE_STORAGE_ACCOUNT_NAME: guidapistaticprodweusa
+  STATIC_FILES_WORKING_DIRECTORY: ./src/static-site/
+
+jobs:
+  publish-bicep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: bicep-templates
+          path: deployment/infrastructure/
+
+  infrastructure-incremental:
+    needs: publish-bicep
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: bicep-templates
+          path: ./infrastructure
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_DEV }}
+
+      - name: Deploy Infrastructure
+        id: deployinfrastructure
+        uses: Azure/cli@1.0.4
+        with:
+          inlineScript: az deployment sub create --location WestEurope --template-file ./infrastructure/main.bicep --parameters ./infrastructure/parameters.json
+
+  deploy-static-site:
+    needs: infrastructure-incremental
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_DEV }}
+      - name: Configure static site hosting
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az storage blob service-properties update --account-name ${{ AZURE_STORAGE_ACCOUNT_NAME }} --static-website --index-document index.html --404-document 404.html
+      - name: Upload to blob storage
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az storage blob upload-batch --account-name ${{ AZURE_STORAGE_ACCOUNT_NAME }} --auth-mode key -d '$web' -s ${{ STATIC_FILES_WORKING_DIRECTORY }}
