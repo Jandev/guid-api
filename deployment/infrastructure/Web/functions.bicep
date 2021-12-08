@@ -45,7 +45,7 @@ resource webAppNewCname 'Microsoft.Web/sites/hostNameBindings@2021-02-01' = {
 resource webApiNewCname 'Microsoft.Web/sites/hostNameBindings@2021-02-01' = {
   name: '${webAppName}/api.guid.codes'
   dependsOn: [
-    webApp
+    webAppNewCname
   ]
   properties: {
     customHostNameDnsRecordType: 'CName'
