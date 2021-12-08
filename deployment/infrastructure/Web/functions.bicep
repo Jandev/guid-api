@@ -42,6 +42,18 @@ resource webAppNewCname 'Microsoft.Web/sites/hostNameBindings@2021-02-01' = {
     sslState: 'Disabled'
   }
 }
+resource webApiNewCname 'Microsoft.Web/sites/hostNameBindings@2021-02-01' = {
+  name: '${webAppName}/api.guid.codes'
+  dependsOn: [
+    webApp
+  ]
+  properties: {
+    customHostNameDnsRecordType: 'CName'
+    siteName: 'api.guid.codes'
+    hostNameType: 'Verified'
+    sslState: 'Disabled'
+  }
+}
 
 output servicePrincipal string = webApp.identity.principalId
 output webAppName string = webAppName
