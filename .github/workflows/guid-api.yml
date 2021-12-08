@@ -3,8 +3,8 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "!src/static-site/**"
+    paths-ignore:
+      - "src/static-site/**"
 env:
   AZURE_FUNCTIONAPP_NAME_EU1: guidapi-prod-weu-app
   AZURE_FUNCTIONAPP_NAME_US1: guidapi-prod-wus-app
