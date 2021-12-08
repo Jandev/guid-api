@@ -9,7 +9,7 @@ param azureRegion string
 param systemName string
 
 module  webApiStorageAccount 'Storage/storageAccounts.bicep' = {
-  name: 'storageAccountAppDeploy'
+  name: 'storageAccountAppDeployStaticSite'
   params: {
     environmentName: environmentName
     systemName: '${systemName}static'
