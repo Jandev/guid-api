@@ -94,3 +94,13 @@ module trafficManagerProfile 'Network/trafficManagerProfiles.bicep' = {
   }
   scope: rgInfrastructure
 }
+
+module staticSite 'static-site.bicep' = {
+  name: 'staticSite'
+  params: {
+    azureRegion: regionWestEuropeName
+    environmentName: environmentName
+    systemName: systemName
+  }  
+  scope: rgWestEurope
+}
