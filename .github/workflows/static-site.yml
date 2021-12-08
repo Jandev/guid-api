@@ -4,7 +4,7 @@ on:
     branches:
       - main
     paths:
-      - src/static-site/**
+      - "src/static-site/**"
 
 env:
   AZURE_STORAGE_ACCOUNT_NAME: guidapistaticprodweusa
