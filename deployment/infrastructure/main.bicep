@@ -66,14 +66,23 @@ module applicationAustraliaSouthEast 'application-infrastructure.bicep' = {
 
 module trafficManagerProfile 'Network/trafficManagerProfiles.bicep' = {
   name: 'trafficManagerProfileModule'
+  params: {
+    environmentName: environmentName
+    systemName: systemName
+  }
+  scope: rgInfrastructure
+}
+
+module endpoints 'Network/trafficManagerProfilesEndpoint.bicep' = {
+  name: 'trafficManagerProfileEndpoints'
   dependsOn: [
+    trafficManagerProfile
     applicationAustraliaSouthEast
     applicationWestEurope
     applicationWestUs
   ]
   params: {
-    environmentName: environmentName
-    systemName: systemName
+    trafficManagerProfileName: trafficManagerProfile.outputs.instanceName
     webAppEndpoints: [
       {
         webAppNameToAdd: applicationAustraliaSouthEast.outputs.webApplicationName
