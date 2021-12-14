@@ -12,6 +12,8 @@ param appServicePlanId string
 
 var webAppName = toLower('${systemName}-${environmentName}-${azureRegion}-app')
 
+var subdomainPrefix = (environmentName == 'prod') ? '' : '${environmentName}.'
+
 resource webApp 'Microsoft.Web/sites@2020-12-01' = {
   name: webAppName
   location: resourceGroup().location
@@ -31,25 +33,25 @@ resource webApp 'Microsoft.Web/sites@2020-12-01' = {
   }
 }
 resource webAppNewCname 'Microsoft.Web/sites/hostNameBindings@2021-02-01' = {
-  name: '${webAppName}/new.guid.codes'
+  name: '${webAppName}/${subdomainPrefix}new.guid.codes'
   dependsOn: [
     webApp
   ]
   properties: {
     customHostNameDnsRecordType: 'CName'
-    siteName: 'new.guid.codes'
+    siteName: '${subdomainPrefix}new.guid.codes'
     hostNameType: 'Verified'
     sslState: 'Disabled'
   }
 }
 resource webApiNewCname 'Microsoft.Web/sites/hostNameBindings@2021-02-01' = {
-  name: '${webAppName}/api.guid.codes'
+  name: '${webAppName}/${subdomainPrefix}api.guid.codes'
   dependsOn: [
     webAppNewCname
   ]
   properties: {
     customHostNameDnsRecordType: 'CName'
-    siteName: 'api.guid.codes'
+    siteName: '${subdomainPrefix}api.guid.codes'
     hostNameType: 'Verified'
     sslState: 'Disabled'
   }
