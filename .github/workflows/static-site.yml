@@ -40,7 +40,7 @@ jobs:
         id: deployinfrastructure
         uses: Azure/cli@1.0.4
         with:
-          inlineScript: az deployment sub create --location WestEurope --template-file ./infrastructure/main.bicep --parameters ./infrastructure/parameters.json
+          inlineScript: az deployment sub create --location WestEurope --template-file ./infrastructure/main-static-site.bicep --parameters ./infrastructure/parameters.json
 
   deploy-static-site:
     needs: infrastructure-incremental
