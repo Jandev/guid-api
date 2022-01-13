@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Mime;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -13,9 +14,6 @@ namespace Api
 {
     public static class NewGuid
     {
-        private const string JsonMimeType = "application/json";
-        private const string PlainTextMimeType = "text/plain";
-
         [FunctionName("DefaultNewGuid")]
         public static HttpResponseMessage Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "GET", Route = null)]
@@ -34,14 +32,14 @@ namespace Api
         {
             return mimeTypeRequest switch
             {
-                JsonMimeType => new HttpResponseMessage(HttpStatusCode.OK)
+                MediaTypeNames.Application.Json => new HttpResponseMessage(HttpStatusCode.OK)
                 {
                     Content = new StringContent(JsonConvert.SerializeObject(new { value = guid }), Encoding.UTF8,
-                        JsonMimeType)
+                        MediaTypeNames.Application.Json)
                 },
                 _ => new HttpResponseMessage(HttpStatusCode.OK)
                 {
-                    Content = new StringContent(guid, Encoding.UTF8, PlainTextMimeType)
+                    Content = new StringContent(guid, Encoding.UTF8, MediaTypeNames.Text.Plain)
                 }
             };
         }
