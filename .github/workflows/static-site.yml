@@ -23,7 +23,7 @@ jobs:
           name: bicep-templates
           path: deployment/infrastructure/
 
-  infrastructure-incremental-test:
+  infrastructure-test:
     needs: publish-bicep
     runs-on: ubuntu-latest
     environment: Test
@@ -45,7 +45,7 @@ jobs:
           inlineScript: az deployment sub create --location WestEurope --template-file ./infrastructure/main-static-site.bicep --parameters ./infrastructure/parameters.test.json
 
   deploy-static-site-test:
-    needs: infrastructure-incremental-test
+    needs: infrastructure-test
     runs-on: ubuntu-latest
     environment: Test
     steps:
@@ -65,7 +65,7 @@ jobs:
           inlineScript: |
             az storage blob upload-batch --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME_TEST }} --auth-mode key -d '$web' -s ${{ env.STATIC_FILES_WORKING_DIRECTORY }}
 
-  infrastructure-incremental-production:
+  infrastructure-production:
     needs: [publish-bicep, deploy-static-site-test]
     runs-on: ubuntu-latest
     environment: Production
@@ -87,7 +87,7 @@ jobs:
           inlineScript: az deployment sub create --location WestEurope --template-file ./infrastructure/main-static-site.bicep --parameters ./infrastructure/parameters.json
 
   deploy-static-site-production:
-    needs: infrastructure-incremental-production
+    needs: infrastructure-production
     runs-on: ubuntu-latest
     environment: Production
     steps:
