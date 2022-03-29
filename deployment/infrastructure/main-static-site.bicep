@@ -1,10 +1,10 @@
 @allowed([
   'dev'
-  'test'
+  'tst'
   'acc'
-  'prod'
+  'prd'
 ])
-param environmentName string = 'prod'
+param environmentName string = 'prd'
 
 var systemName = 'guidapi'
 var fullSystemPrefix = '${systemName}-${environmentName}'

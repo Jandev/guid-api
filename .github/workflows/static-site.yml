@@ -8,7 +8,8 @@ on:
       - "src/static-site/**"
 
 env:
-  AZURE_STORAGE_ACCOUNT_NAME: guidapistaticprodweusa
+  AZURE_STORAGE_ACCOUNT_NAME: guidapistaticprdweusa
+  AZURE_STORAGE_ACCOUNT_NAME_TEST: guidapistatictstweusa
   STATIC_FILES_WORKING_DIRECTORY: ./src/static-site/
 
 jobs:
@@ -22,9 +23,53 @@ jobs:
           name: bicep-templates
           path: deployment/infrastructure/
 
-  infrastructure-incremental:
+  infrastructure-test:
     needs: publish-bicep
     runs-on: ubuntu-latest
+    environment: Test
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: bicep-templates
+          path: ./infrastructure
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_DEV }}
+
+      - name: Deploy Infrastructure
+        id: deployinfrastructure
+        uses: Azure/cli@1.0.4
+        with:
+          inlineScript: az deployment sub create --location WestEurope --template-file ./infrastructure/main-static-site.bicep --parameters ./infrastructure/parameters.test.json
+
+  deploy-static-site-test:
+    needs: infrastructure-test
+    runs-on: ubuntu-latest
+    environment: Test
+    steps:
+      - uses: actions/checkout@v2
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_DEV }}
+      - name: Configure static site hosting
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az storage blob service-properties update --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME_TEST }} --static-website --index-document index.html --404-document 404.html
+      - name: Upload to blob storage
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az storage blob upload-batch --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME_TEST }} --auth-mode key -d '$web' -s ${{ env.STATIC_FILES_WORKING_DIRECTORY }}
+
+  infrastructure-production:
+    needs: [publish-bicep, deploy-static-site-test]
+    runs-on: ubuntu-latest
+    environment: Production
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v2
@@ -42,9 +87,11 @@ jobs:
         with:
           inlineScript: az deployment sub create --location WestEurope --template-file ./infrastructure/main-static-site.bicep --parameters ./infrastructure/parameters.json
 
-  deploy-static-site:
-    needs: infrastructure-incremental
+  deploy-static-site-production:
+    needs: infrastructure-production
     runs-on: ubuntu-latest
+    environment: Production
+    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v2
       - name: Azure Login

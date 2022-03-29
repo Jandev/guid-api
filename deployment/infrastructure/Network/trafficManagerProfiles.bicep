@@ -1,9 +1,9 @@
 param systemName string
 @allowed([
   'dev'
-  'test'
+  'tst'
   'acc'
-  'prod'
+  'prd'
 ])
 param environmentName string
 param relativeLiveEndpoint string = '/api/Live'
