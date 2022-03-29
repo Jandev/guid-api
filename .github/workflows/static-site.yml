@@ -66,7 +66,7 @@ jobs:
           inlineScript: az deployment sub create --location WestEurope --template-file ./infrastructure/main-static-site.bicep --parameters ./infrastructure/parameters.json
 
   deploy-static-site-test:
-    needs: infrastructure-incremental
+    needs: infrastructure-incremental-test
     runs-on: ubuntu-latest
     environment: Test
     steps:
@@ -87,7 +87,7 @@ jobs:
             az storage blob upload-batch --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME_TEST }} --auth-mode key -d '$web' -s ${{ env.STATIC_FILES_WORKING_DIRECTORY }}
 
   deploy-static-site-production:
-    needs: infrastructure-incremental
+    needs: infrastructure-incremental-production
     runs-on: ubuntu-latest
     environment: Production
     steps:
