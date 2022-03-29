@@ -1,5 +1,6 @@
 name: Build and deploy .NET Core application to Function App guid-api
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -12,8 +13,15 @@ env:
   AZURE_RESOURCEGROUP_NAME_EU1: guidapi-prd-weu
   AZURE_RESOURCEGROUP_NAME_US1: guidapi-prd-wus
   AZURE_RESOURCEGROUP_NAME_AU1: guidapi-prd-aus
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: "."
   AZURE_STATIC_SITE_STORAGE_ACCOUNT: "guidapistaticprdweu.blob.core.windows.net"
+  AZURE_FUNCTIONAPP_NAME_TEST_EU1: guidapi-tst-weu-app
+  AZURE_FUNCTIONAPP_NAME_TEST_US1: guidapi-tst-wus-app
+  AZURE_FUNCTIONAPP_NAME_TEST_AU1: guidapi-tst-aus-app
+  AZURE_RESOURCEGROUP_NAME_TEST_EU1: guidapi-tst-weu
+  AZURE_RESOURCEGROUP_NAME_TEST_US1: guidapi-tst-wus
+  AZURE_RESOURCEGROUP_NAME_TEST_AU1: guidapi-tst-aus
+  AZURE_STATIC_SITE_STORAGE_ACCOUNT_TEST: "guidapistatictstweu.blob.core.windows.net"
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: "."
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 3.1.x
   WORKING_DIRECTORY: src
@@ -66,9 +74,63 @@ jobs:
           name: bicep-templates
           path: deployment/infrastructure/
 
-  infrastructure-incremental:
+  infrastructure-test:
     needs: publish-bicep
     runs-on: ubuntu-latest
+    environment: Test
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: bicep-templates
+          path: ./infrastructure
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_DEV }}
+
+      - name: Deploy Infrastructure
+        id: deployinfrastructure
+        uses: Azure/cli@1.0.4
+        with:
+          inlineScript: az deployment sub create --location WestEurope --template-file ./infrastructure/main.bicep --parameters ./infrastructure/parameters.test.json
+
+  deploy-functions-test:
+    needs: [compile-functions-app, infrastructure-incremental]
+    runs-on: ubuntu-latest
+    environment: Test
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: functions-artifact
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_DEV }}
+
+      - name: "Deploy web app - EU1"
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME_TEST_EU1 }}
+          package: "artifact.zip"
+
+      - name: "Deploy web app - US1"
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME_TEST_US1 }}
+          package: "artifact.zip"
+
+      - name: "Deploy web app - AU1"
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME_TEST_AU1 }}
+          package: "artifact.zip"
+
+  infrastructure-production:
+    needs: publish-bicep
+    runs-on: ubuntu-latest
+    environment: Production
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v2
@@ -86,9 +148,10 @@ jobs:
         with:
           inlineScript: az deployment sub create --location WestEurope --template-file ./infrastructure/main.bicep --parameters ./infrastructure/parameters.json
 
-  deploy-functions-dev:
+  deploy-functions-production:
     needs: [compile-functions-app, infrastructure-incremental]
     runs-on: ubuntu-latest
+    environment: Production
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v2
