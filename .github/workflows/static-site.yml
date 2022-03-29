@@ -23,9 +23,31 @@ jobs:
           name: bicep-templates
           path: deployment/infrastructure/
 
-  infrastructure-incremental:
+  infrastructure-incremental-test:
     needs: publish-bicep
     runs-on: ubuntu-latest
+    environment: Test
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: bicep-templates
+          path: ./infrastructure
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_DEV }}
+
+      - name: Deploy Infrastructure
+        id: deployinfrastructure
+        uses: Azure/cli@1.0.4
+        with:
+          inlineScript: az deployment sub create --location WestEurope --template-file ./infrastructure/main-static-site.bicep --parameters ./infrastructure/parameters.test.json
+
+  infrastructure-incremental-production:
+    needs: publish-bicep
+    runs-on: ubuntu-latest
+    environment: Production
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v2
