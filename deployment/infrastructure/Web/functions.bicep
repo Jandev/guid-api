@@ -12,7 +12,7 @@ param appServicePlanId string
 
 var webAppName = toLower('${systemName}-${environmentName}-${azureRegion}-app')
 
-var subdomainPrefix = (environmentName == 'prod') ? '' : '${environmentName}.'
+var subdomainPrefix = (environmentName == 'prd') ? '' : '${environmentName}.'
 
 resource webApp 'Microsoft.Web/sites@2020-12-01' = {
   name: webAppName
