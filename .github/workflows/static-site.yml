@@ -69,6 +69,7 @@ jobs:
     needs: [publish-bicep, deploy-static-site-test]
     runs-on: ubuntu-latest
     environment: Production
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v2
@@ -90,6 +91,7 @@ jobs:
     needs: infrastructure-production
     runs-on: ubuntu-latest
     environment: Production
+    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v2
       - name: Azure Login
