@@ -44,27 +44,6 @@ jobs:
         with:
           inlineScript: az deployment sub create --location WestEurope --template-file ./infrastructure/main-static-site.bicep --parameters ./infrastructure/parameters.test.json
 
-  infrastructure-incremental-production:
-    needs: publish-bicep
-    runs-on: ubuntu-latest
-    environment: Production
-    steps:
-      - name: Download Artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: bicep-templates
-          path: ./infrastructure
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_DEV }}
-
-      - name: Deploy Infrastructure
-        id: deployinfrastructure
-        uses: Azure/cli@1.0.4
-        with:
-          inlineScript: az deployment sub create --location WestEurope --template-file ./infrastructure/main-static-site.bicep --parameters ./infrastructure/parameters.json
-
   deploy-static-site-test:
     needs: infrastructure-incremental-test
     runs-on: ubuntu-latest
@@ -85,6 +64,27 @@ jobs:
         with:
           inlineScript: |
             az storage blob upload-batch --account-name ${{ env.AZURE_STORAGE_ACCOUNT_NAME_TEST }} --auth-mode key -d '$web' -s ${{ env.STATIC_FILES_WORKING_DIRECTORY }}
+
+  infrastructure-incremental-production:
+    needs: [publish-bicep, deploy-static-site-test]
+    runs-on: ubuntu-latest
+    environment: Production
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: bicep-templates
+          path: ./infrastructure
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_DEV }}
+
+      - name: Deploy Infrastructure
+        id: deployinfrastructure
+        uses: Azure/cli@1.0.4
+        with:
+          inlineScript: az deployment sub create --location WestEurope --template-file ./infrastructure/main-static-site.bicep --parameters ./infrastructure/parameters.json
 
   deploy-static-site-production:
     needs: infrastructure-incremental-production
