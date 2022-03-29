@@ -96,7 +96,7 @@ jobs:
           inlineScript: az deployment sub create --location WestEurope --template-file ./infrastructure/main.bicep --parameters ./infrastructure/parameters.test.json
 
   deploy-functions-test:
-    needs: [compile-functions-app, infrastructure-incremental]
+    needs: [compile-functions-app, infrastructure-test]
     runs-on: ubuntu-latest
     environment: Test
     steps:
@@ -128,7 +128,7 @@ jobs:
           package: "artifact.zip"
 
   infrastructure-production:
-    needs: publish-bicep
+    needs: [publish-bicep, deploy-functions-test]
     runs-on: ubuntu-latest
     environment: Production
     steps:
