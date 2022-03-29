@@ -6,14 +6,14 @@ on:
     paths-ignore:
       - "src/static-site/**"
 env:
-  AZURE_FUNCTIONAPP_NAME_EU1: guidapi-prod-weu-app
-  AZURE_FUNCTIONAPP_NAME_US1: guidapi-prod-wus-app
-  AZURE_FUNCTIONAPP_NAME_AU1: guidapi-prod-aus-app
-  AZURE_RESOURCEGROUP_NAME_EU1: guidapi-prod-weu
-  AZURE_RESOURCEGROUP_NAME_US1: guidapi-prod-wus
-  AZURE_RESOURCEGROUP_NAME_AU1: guidapi-prod-aus
+  AZURE_FUNCTIONAPP_NAME_EU1: guidapi-prd-weu-app
+  AZURE_FUNCTIONAPP_NAME_US1: guidapi-prd-wus-app
+  AZURE_FUNCTIONAPP_NAME_AU1: guidapi-prd-aus-app
+  AZURE_RESOURCEGROUP_NAME_EU1: guidapi-prd-weu
+  AZURE_RESOURCEGROUP_NAME_US1: guidapi-prd-wus
+  AZURE_RESOURCEGROUP_NAME_AU1: guidapi-prd-aus
   AZURE_FUNCTIONAPP_PACKAGE_PATH: "."
-  AZURE_STATIC_SITE_STORAGE_ACCOUNT: "guidapistaticprodweu.blob.core.windows.net"
+  AZURE_STATIC_SITE_STORAGE_ACCOUNT: "guidapistaticprdweu.blob.core.windows.net"
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 3.1.x
   WORKING_DIRECTORY: src

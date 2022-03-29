@@ -1,11 +1,11 @@
 param systemName string
 @allowed([
   'dev'
-  'test'
+  'tst'
   'acc'
-  'prod'
+  'prd'
 ])
-param environmentName string = 'prod'
+param environmentName string = 'prd'
 param azureRegion string = 'weu'
 
 var applicationInsightsName = '${systemName}-${environmentName}-${azureRegion}-ai'
