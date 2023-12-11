@@ -7,20 +7,20 @@ on:
     paths-ignore:
       - "src/static-site/**"
 env:
-  AZURE_FUNCTIONAPP_NAME_EU1: guidapi-prd-weu-app
-  AZURE_FUNCTIONAPP_NAME_US1: guidapi-prd-wus-app
-  AZURE_FUNCTIONAPP_NAME_AU1: guidapi-prd-aus-app
-  AZURE_RESOURCEGROUP_NAME_EU1: guidapi-prd-weu
-  AZURE_RESOURCEGROUP_NAME_US1: guidapi-prd-wus
-  AZURE_RESOURCEGROUP_NAME_AU1: guidapi-prd-aus
-  AZURE_STATIC_SITE_STORAGE_ACCOUNT: "guidapistaticprdweu.blob.core.windows.net"
-  AZURE_FUNCTIONAPP_NAME_TEST_EU1: guidapi-tst-weu-app
-  AZURE_FUNCTIONAPP_NAME_TEST_US1: guidapi-tst-wus-app
-  AZURE_FUNCTIONAPP_NAME_TEST_AU1: guidapi-tst-aus-app
-  AZURE_RESOURCEGROUP_NAME_TEST_EU1: guidapi-tst-weu
-  AZURE_RESOURCEGROUP_NAME_TEST_US1: guidapi-tst-wus
-  AZURE_RESOURCEGROUP_NAME_TEST_AU1: guidapi-tst-aus
-  AZURE_STATIC_SITE_STORAGE_ACCOUNT_TEST: "guidapistatictstweu.blob.core.windows.net"
+  AZURE_FUNCTIONAPP_NAME_EU1: jvguidapi-prd-weu-app
+  AZURE_FUNCTIONAPP_NAME_US1: jvguidapi-prd-wus-app
+  AZURE_FUNCTIONAPP_NAME_AU1: jvguidapi-prd-aus-app
+  AZURE_RESOURCEGROUP_NAME_EU1: jvguidapi-prd-weu
+  AZURE_RESOURCEGROUP_NAME_US1: jvguidapi-prd-wus
+  AZURE_RESOURCEGROUP_NAME_AU1: jvguidapi-prd-aus
+  AZURE_STATIC_SITE_STORAGE_ACCOUNT: "jvguidapistaticprdweu.blob.core.windows.net"
+  AZURE_FUNCTIONAPP_NAME_TEST_EU1: jvguidapi-tst-weu-app
+  AZURE_FUNCTIONAPP_NAME_TEST_US1: jvguidapi-tst-wus-app
+  AZURE_FUNCTIONAPP_NAME_TEST_AU1: jvguidapi-tst-aus-app
+  AZURE_RESOURCEGROUP_NAME_TEST_EU1: jvguidapi-tst-weu
+  AZURE_RESOURCEGROUP_NAME_TEST_US1: jvguidapi-tst-wus
+  AZURE_RESOURCEGROUP_NAME_TEST_AU1: jvguidapi-tst-aus
+  AZURE_STATIC_SITE_STORAGE_ACCOUNT_TEST: "jvguidapistatictstweu.blob.core.windows.net"
   AZURE_FUNCTIONAPP_PACKAGE_PATH: "."
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 3.1.x

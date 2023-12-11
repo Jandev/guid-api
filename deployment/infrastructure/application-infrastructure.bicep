@@ -8,6 +8,8 @@ param environmentName string
 param azureRegion string
 param systemName string
 
+param bringYourOwnInsightsIdentifier string = ''
+
 var webAppName = '${systemName}-${environmentName}-${azureRegion}-app'
 
 targetScope = 'resourceGroup'
@@ -27,6 +29,7 @@ module applicationInsights 'Insights/components.bicep' = {
     environmentName: environmentName
     systemName: systemName
     azureRegion: azureRegion
+    bringYourOwn: bringYourOwnInsightsIdentifier
   }
 }
 
