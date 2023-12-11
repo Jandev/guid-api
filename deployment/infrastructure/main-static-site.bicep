@@ -6,7 +6,7 @@
 ])
 param environmentName string = 'prd'
 
-var systemName = 'guidapi'
+var systemName = 'jvguidapi'
 var fullSystemPrefix = '${systemName}-${environmentName}'
 var regionWestEuropeName = 'weu'
 
