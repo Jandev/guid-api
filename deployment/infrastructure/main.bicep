@@ -6,32 +6,40 @@
 ])
 param environmentName string = 'prd'
 
-var systemName = 'guidapi'
+param bringYourOwnInsightsIdentifier string = ''
+
+var systemName = 'jvguidapi'
 var fullSystemPrefix = '${systemName}-${environmentName}'
 var regionWestEuropeName = 'weu'
 var regionWestUsName = 'wus'
 var regionAustraliaSouthEastName = 'aus'
 
+var location = {
+  westEurope: 'westeurope'
+  westUs: 'westus'
+  australiaSouthEast: 'australiasoutheast'
+}
+
 targetScope = 'subscription'
 
 resource rgInfrastructure 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: '${fullSystemPrefix}-infra'
-  location: 'westeurope'
+  location: location.westEurope
 }
 
 resource rgWestEurope 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: '${fullSystemPrefix}-${regionWestEuropeName}'
-  location: 'westeurope'
+  location: location.westEurope
 }
 
 resource rgWestUs 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: '${fullSystemPrefix}-${regionWestUsName}'
-  location: 'westus'
+  location: location.westUs
 }
 
 resource rgAustraliaSouthEast 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: '${fullSystemPrefix}-${regionAustraliaSouthEastName}'
-  location: 'australiasoutheast'
+  location: location.australiaSouthEast
 }
 
 module applicationWestEurope 'application-infrastructure.bicep' = {
@@ -40,6 +48,7 @@ module applicationWestEurope 'application-infrastructure.bicep' = {
     azureRegion: regionWestEuropeName
     environmentName: environmentName
     systemName: systemName
+    bringYourOwnInsightsIdentifier: bringYourOwnInsightsIdentifier
   }
   scope: rgWestEurope
 }
@@ -50,6 +59,7 @@ module applicationWestUs 'application-infrastructure.bicep' = {
     azureRegion: regionWestUsName
     environmentName: environmentName
     systemName: systemName
+    bringYourOwnInsightsIdentifier: bringYourOwnInsightsIdentifier
   }
   scope: rgWestUs
 }
@@ -60,6 +70,7 @@ module applicationAustraliaSouthEast 'application-infrastructure.bicep' = {
     azureRegion: regionAustraliaSouthEastName
     environmentName: environmentName
     systemName: systemName
+    bringYourOwnInsightsIdentifier: bringYourOwnInsightsIdentifier
   }
   scope: rgAustraliaSouthEast
 }

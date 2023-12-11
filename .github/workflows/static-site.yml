@@ -8,8 +8,8 @@ on:
       - "src/static-site/**"
 
 env:
-  AZURE_STORAGE_ACCOUNT_NAME: guidapistaticprdweusa
-  AZURE_STORAGE_ACCOUNT_NAME_TEST: guidapistatictstweusa
+  AZURE_STORAGE_ACCOUNT_NAME: jvguidapistaticprdweusa
+  AZURE_STORAGE_ACCOUNT_NAME_TEST: jvguidapistatictstweusa
   STATIC_FILES_WORKING_DIRECTORY: ./src/static-site/
 
 jobs:

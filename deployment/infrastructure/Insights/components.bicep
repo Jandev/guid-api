@@ -7,10 +7,11 @@ param systemName string
 ])
 param environmentName string = 'prd'
 param azureRegion string = 'weu'
+param bringYourOwn string
 
 var applicationInsightsName = '${systemName}-${environmentName}-${azureRegion}-ai'
 
-resource applicationInsights 'Microsoft.Insights/components@2020-02-02-preview' = {
+resource applicationInsights 'Microsoft.Insights/components@2020-02-02-preview' = if(empty(bringYourOwn)) {
   kind: 'web'
   location: resourceGroup().location
   name: applicationInsightsName
@@ -19,5 +20,5 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02-preview' 
   }
 }
 
-output applicationInsightsName string = applicationInsightsName
-output instrumentationKey string = applicationInsights.properties.InstrumentationKey
+output applicationInsightsName string = empty(bringYourOwn) ? applicationInsightsName : reference(bringYourOwn, '2020-02-02').name
+output instrumentationKey string = empty(bringYourOwn) ? applicationInsights.properties.InstrumentationKey : reference(bringYourOwn, '2020-02-02').InstrumentationKey
