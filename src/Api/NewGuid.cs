@@ -1,47 +1,49 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Net.Mime;
 using System.Text;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Api
 {
-    public static class NewGuid
+    public class NewGuid
     {
-        [FunctionName("DefaultNewGuid")]
-        public static HttpResponseMessage Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", Route = null)]
-            HttpRequest req,
-            ILogger log)
+        private readonly ILogger<NewGuid> _logger;
+
+        public NewGuid(ILogger<NewGuid> logger)
         {
-            var guid = Guid.NewGuid().ToString("D");
-            log.LogInformation("Created guid `{0}`", guid);
-
-            var mimeTypeRequest = req.Headers["Accept"].FirstOrDefault();
-
-            return CreateContentByAcceptHeader(mimeTypeRequest, guid);
+            _logger = logger;
         }
 
-        private static HttpResponseMessage CreateContentByAcceptHeader(string mimeTypeRequest, string guid)
+        [Function("DefaultNewGuid")]
+        public async Task<HttpResponseData> Run(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", Route = null)]
+            HttpRequestData req)
         {
-            return mimeTypeRequest switch
+            var guid = Guid.NewGuid().ToString("D");
+            _logger.LogInformation("Created guid `{Guid}`", guid);
+
+            var acceptHeader = req.Headers.GetValues("Accept").FirstOrDefault();
+            
+            var response = req.CreateResponse(HttpStatusCode.OK);
+            
+            if (acceptHeader?.Contains("application/json") == true)
             {
-                MediaTypeNames.Application.Json => new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = new StringContent(JsonConvert.SerializeObject(new { value = guid }), Encoding.UTF8,
-                        MediaTypeNames.Application.Json)
-                },
-                _ => new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = new StringContent(guid, Encoding.UTF8, MediaTypeNames.Text.Plain)
-                }
-            };
+                response.Headers.Add("Content-Type", "application/json");
+                var jsonResponse = JsonSerializer.Serialize(new { value = guid });
+                await response.WriteStringAsync(jsonResponse);
+            }
+            else
+            {
+                response.Headers.Add("Content-Type", "text/plain");
+                await response.WriteStringAsync(guid);
+            }
+
+            return response;
         }
     }
 }

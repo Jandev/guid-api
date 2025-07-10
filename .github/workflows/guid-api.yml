@@ -1,4 +1,4 @@
-name: Build and deploy .NET Core application to Function App guid-api
+name: Build and deploy .NET 8 application to Function App guid-api
 on:
   workflow_dispatch:
   push:
@@ -23,22 +23,22 @@ env:
   AZURE_STATIC_SITE_STORAGE_ACCOUNT_TEST: "jvguidapistatictstweu.blob.core.windows.net"
   AZURE_FUNCTIONAPP_PACKAGE_PATH: "."
   CONFIGURATION: Release
-  DOTNET_CORE_VERSION: 3.1.x
+  DOTNET_CORE_VERSION: 8.x
   WORKING_DIRECTORY: src
   DOTNET_CORE_VERSION_INPROC: ""
 jobs:
   compile-functions-app:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Setup .NET Core ${{ env.DOTNET_CORE_VERSION }}
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
 
       - name: Setup .NET Core (for inproc extensions)
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_CORE_VERSION_INPROC }}
 
@@ -67,7 +67,7 @@ jobs:
   publish-bicep:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Publish Artifact
         uses: actions/upload-artifact@v4
         with:

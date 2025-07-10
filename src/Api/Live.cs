@@ -1,18 +1,18 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
+using System.Net;
 
 namespace Api
 {
-    public static class Live
+    public class Live
     {
-        [FunctionName(nameof(Live))]
-        public static IActionResult Run(
+        [Function(nameof(Live))]
+        public HttpResponseData Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] 
-            HttpRequest req)
+            HttpRequestData req)
         {
-            return new OkResult();
+            var response = req.CreateResponse(HttpStatusCode.OK);
+            return response;
         }
     }
 }
