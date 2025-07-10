@@ -102,6 +102,14 @@ resource config 'Microsoft.Web/sites/config@2023-01-01' = {
         name: 'WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED'
         value: '1'
       }
+      {
+        name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
+        value: 'false'
+      }
+      {
+        name: 'ENABLE_ORYX_BUILD'
+        value: 'false'
+      }
     ]
   }
 }
