@@ -14,7 +14,7 @@ var webAppName = toLower('${systemName}-${environmentName}-${azureRegion}-app')
 
 var subdomainPrefix = (environmentName == 'prd') ? '' : '${environmentName}.'
 
-resource webApp 'Microsoft.Web/sites@2020-12-01' = {
+resource webApp 'Microsoft.Web/sites@2023-01-01' = {
   name: webAppName
   location: resourceGroup().location
   kind: 'functionapp,linux'
@@ -25,7 +25,21 @@ resource webApp 'Microsoft.Web/sites@2020-12-01' = {
     siteConfig: {
       ftpsState: 'Disabled'
       http20Enabled: true
-      linuxFxVersion: 'DOTNET|3.1'
+      linuxFxVersion: 'DOTNET-ISOLATED|8.0'
+      appSettings: [
+        {
+          name: 'FUNCTIONS_EXTENSION_VERSION'
+          value: '~4'
+        }
+        {
+          name: 'FUNCTIONS_WORKER_RUNTIME'
+          value: 'dotnet-isolated'
+        }
+        {
+          name: 'WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED'
+          value: '1'
+        }
+      ]
     }
   }
   identity: {

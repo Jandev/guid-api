@@ -45,5 +45,14 @@ namespace Api
 
             return response;
         }
+
+        [Function("NewGuidRoot")]
+        public async Task<HttpResponseData> RunRoot(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", Route = "/")]
+            HttpRequestData req)
+        {
+            // Delegate to the main function
+            return await Run(req);
+        }
     }
 }

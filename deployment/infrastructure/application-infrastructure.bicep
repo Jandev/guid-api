@@ -57,7 +57,7 @@ module functionAppModule 'Web/functions.bicep' = {
   }
 }
 
-resource config 'Microsoft.Web/sites/config@2020-12-01' = {
+resource config 'Microsoft.Web/sites/config@2023-01-01' = {
   dependsOn: [
     functionAppModule
   ]
@@ -76,11 +76,11 @@ resource config 'Microsoft.Web/sites/config@2020-12-01' = {
       }
       {
         name: 'FUNCTIONS_EXTENSION_VERSION'
-        value: '~3'
+        value: '~4'
       }
       {
         name: 'FUNCTIONS_WORKER_RUNTIME'
-        value: 'dotnet'
+        value: 'dotnet-isolated'
       }
       {
         name: 'WEBSITE_CONTENTSHARE'
@@ -97,6 +97,10 @@ resource config 'Microsoft.Web/sites/config@2020-12-01' = {
       {
         name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
         value: webApiStorageAccount.outputs.connectionString
+      }
+      {
+        name: 'WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED'
+        value: '1'
       }
     ]
   }
