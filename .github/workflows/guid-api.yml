@@ -28,7 +28,7 @@ env:
   DOTNET_CORE_VERSION_INPROC: ""
 jobs:
   compile-functions-app:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -65,7 +65,7 @@ jobs:
           path: artifact.zip
 
   publish-bicep:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Publish Artifact
@@ -76,7 +76,7 @@ jobs:
 
   infrastructure-test:
     needs: publish-bicep
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: Test
     steps:
       - name: Download Artifact
@@ -97,7 +97,7 @@ jobs:
 
   deploy-functions-test:
     needs: [compile-functions-app, infrastructure-test]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: Test
     steps:
       - name: Download Artifact
@@ -129,7 +129,7 @@ jobs:
 
   infrastructure-production:
     needs: [publish-bicep, deploy-functions-test]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: Production
     if: github.ref == 'refs/heads/main'
     steps:
@@ -151,7 +151,7 @@ jobs:
 
   deploy-functions-production:
     needs: [compile-functions-app, infrastructure-production]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: Production
     if: github.ref == 'refs/heads/main'
     steps:
