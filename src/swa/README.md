@@ -210,6 +210,7 @@ The project is configured for Azure Static Web Apps deployment:
 
 2. **Routing**: Configured in `staticwebapp.config.json`
    - Fallback to `index.html` for SPA behavior
+   - Custom 404 page handling with `404.html`
 
 3. **GitHub Actions**: Automatic deployment on push to main branch
 
@@ -239,6 +240,7 @@ To deploy manually:
 ### `staticwebapp.config.json`
 - Azure Static Web Apps routing rules
 - Fallback navigation for single-page app behavior
+- Custom 404 error page configuration
 
 ### `swa-cli.config.json`
 - Local development configuration for SWA CLI
