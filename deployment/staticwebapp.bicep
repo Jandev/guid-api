@@ -121,18 +121,6 @@ output resourceGroupName string = resourceGroup.name
 @description('The location where the resources were deployed')
 output location string = location
 
-@description('The custom domains associated with the static web app')
-output customDomains array = staticWebAppDeployment.outputs.customDomains
-
-@description('The content distribution endpoint for the static site')
-output contentDistributionEndpoint string = staticWebAppDeployment.outputs.contentDistributionEndpoint
-
-@description('Custom domain configuration')
-output customDomain object = staticWebAppDeployment.outputs.customDomain
-
-@description('DNS configuration instructions')
-output dnsInstructions string = staticWebAppDeployment.outputs.dnsInstructions
-
 @description('Deployment instructions')
 output deploymentInstructions string = '''
 To deploy this Static Web App with custom domain:

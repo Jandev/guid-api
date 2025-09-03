@@ -109,23 +109,3 @@ output defaultHostname string = staticWebApp.properties.defaultHostname
 
 @description('The repository URL')
 output repositoryUrl string = staticWebApp.properties.repositoryUrl
-
-@description('The custom domains associated with the static web app')
-output customDomains array = staticWebApp.properties.customDomains
-
-@description('The content distribution endpoint for the static site')
-output contentDistributionEndpoint string = staticWebApp.properties.contentDistributionEndpoint
-
-@description('Custom domain configuration')
-output customDomain object = enableCustomDomain && sku == 'Standard' ? {
-  domainName: customDomainName
-  validationMethod: validationMethod
-  status: 'Configured (check Azure portal for status)'
-} : {
-  domainName: 'Not configured (requires Standard SKU)'
-  validationMethod: 'N/A'
-  status: 'Not configured'
-}
-
-@description('DNS configuration instructions')
-output dnsInstructions string = enableCustomDomain && sku == 'Standard' ? 'Create a CNAME record: ${customDomainName} -> ${staticWebApp.properties.defaultHostname}' : 'Custom domain not configured (requires Standard SKU and enableCustomDomain=true)'

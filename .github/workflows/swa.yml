@@ -22,8 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploy Infrastructure
     outputs:
-      static-web-app-token: ${{ steps.deploy-infrastructure.outputs.deployment-token }}
-      static-web-app-url: ${{ steps.deploy-infrastructure.outputs.static-web-app-url }}
+      deployment-token: ${{ steps.get-swa-token.outputs.deployment-token }}
+      static-web-app-url: ${{ steps.get-swa-token.outputs.static-web-app-url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -31,6 +31,12 @@ jobs:
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_DEV }}
+
+      - name: Validate Azure Connection
+        run: |
+          echo "Testing Azure CLI connection..."
+          az account show
+          echo "Subscription: ${{ secrets.AZURE_SUBSCRIPTION_ID }}"
 
       - name: Deploy Bicep Infrastructure
         id: deploy-infrastructure
@@ -50,28 +56,43 @@ jobs:
             sku=Standard
             customDomainName=${{ env.CUSTOM_DOMAIN_NAME }}
             enableCustomDomain=${{ env.ENABLE_CUSTOM_DOMAIN }}
-            tags='{"Environment":"${{ github.ref_name == 'main' && 'Production' || 'Development' }}","Repository":"${{ github.repository }}","Branch":"${{ github.ref_name }}"}'
 
       - name: Get Static Web App Deployment Token
         id: get-swa-token
         run: |
+          echo "Waiting for Static Web App to be fully provisioned..."
+          sleep 30
+          
           # Get the deployment token from the Static Web App
+          echo "Retrieving Static Web App deployment token..."
           SWA_TOKEN=$(az staticwebapp secrets list \
             --name ${{ env.AZURE_STATIC_WEB_APP_NAME }} \
             --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
             --query "properties.apiKey" \
             --output tsv)
           
+          if [ -z "$SWA_TOKEN" ]; then
+            echo "Error: Failed to retrieve Static Web App token"
+            exit 1
+          fi
+          
           echo "deployment-token=$SWA_TOKEN" >> $GITHUB_OUTPUT
           
           # Get the default hostname
+          echo "Retrieving Static Web App hostname..."
           SWA_URL=$(az staticwebapp show \
             --name ${{ env.AZURE_STATIC_WEB_APP_NAME }} \
             --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
             --query "defaultHostname" \
             --output tsv)
           
+          if [ -z "$SWA_URL" ]; then
+            echo "Error: Failed to retrieve Static Web App hostname"
+            exit 1
+          fi
+          
           echo "static-web-app-url=https://$SWA_URL" >> $GITHUB_OUTPUT
+          echo "✅ Successfully retrieved Static Web App details"
 
   build_and_deploy:
     needs: infrastructure
@@ -100,7 +121,7 @@ jobs:
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ needs.infrastructure.outputs.static-web-app-token }}
+          azure_static_web_apps_api_token: ${{ needs.infrastructure.outputs.deployment-token }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
           ###### Repository/Build Configurations ######
@@ -126,9 +147,33 @@ jobs:
     runs-on: ubuntu-latest
     name: Close Pull Request Job
     steps:
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_DEV }}
+
+      - name: Get Static Web App Deployment Token
+        id: get-swa-token
+        run: |
+          echo "Retrieving Static Web App deployment token for cleanup..."
+          SWA_TOKEN=$(az staticwebapp secrets list \
+            --name ${{ env.AZURE_STATIC_WEB_APP_NAME }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --query "properties.apiKey" \
+            --output tsv 2>/dev/null) || echo ""
+          
+          if [ -z "$SWA_TOKEN" ]; then
+            echo "Warning: Could not retrieve Static Web App token. Resource may not exist."
+            echo "deployment-token=SKIP" >> $GITHUB_OUTPUT
+          else
+            echo "deployment-token=$SWA_TOKEN" >> $GITHUB_OUTPUT
+          fi
+
       - name: Close Pull Request
         id: closepullrequest
+        if: steps.get-swa-token.outputs.deployment-token != 'SKIP'
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ needs.infrastructure.outputs.static-web-app-token }}
+          azure_static_web_apps_api_token: ${{ steps.get-swa-token.outputs.deployment-token }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "close"
