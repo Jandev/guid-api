@@ -3,20 +3,12 @@ import './theme.css';
 declare const __GUID_API_URL__: string;
 
 /**
- * Gets the API URL from environment variables
- * @returns The API URL to use for requests
- */
-function getApiUrl(): string {
-    return __GUID_API_URL__;
-}
-
-/**
  * Fetches a new GUID from the API
  * @returns Promise containing the GUID string
  */
 async function fetchNewGuid(): Promise<string> {
-    const apiUrl = getApiUrl();
-    const response: Response = await fetch(`${apiUrl}/api/DefaultNewGuid`);
+    // For Static Web Apps, use relative path to the API
+    const response: Response = await fetch('/api/newguid');
     const data: string = await response.text();
     return data;
 }
@@ -35,8 +27,7 @@ function renewElements(): void {
         .catch((error: unknown) => {
             const contextElement = document.getElementById('newGuidContext');
             if (contextElement) {
-                const apiUrl = getApiUrl();
-                contextElement.innerHTML = `Failed to retrieve a new guid. Please navigate to <a href="${apiUrl}/">${apiUrl}/</a>`;
+                contextElement.innerHTML = `Failed to retrieve a new guid. Please check if the API is running.`;
             }
             console.error('Error fetching GUID:', error);
         });
@@ -102,4 +93,4 @@ window.addEventListener("load", (): void => {
 });
 
 // Export functions for potential testing or external use
-export { getApiUrl, fetchNewGuid, renewElements, copyTextToClipboard, fallbackCopyTextToClipboard };
+export { fetchNewGuid, renewElements, copyTextToClipboard, fallbackCopyTextToClipboard };
