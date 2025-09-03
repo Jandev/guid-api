@@ -8,9 +8,9 @@ This directory contains the static web app implementation of the GUID.codes webs
 src/swa/
 ├── guid-site/                    # Main application directory
 │   ├── src/
-│   │   └── index.ts             # TypeScript source code
+│   │   ├── index.ts             # TypeScript source code
+│   │   └── theme.css            # Stylesheets (bundled with TypeScript)
 │   ├── public/                   # Static assets (auto-copied to dist)
-│   │   ├── css/theme.css        # Stylesheets
 │   │   └── *.png, *.ico, etc.   # Favicon and icon files
 │   ├── index.html               # Main page
 │   ├── 404.html                 # Error page
@@ -77,6 +77,7 @@ npm run dev
 - Starts Vite development server on `http://localhost:5173`
 - Hot reload enabled for instant changes
 - TypeScript compilation on-the-fly
+- Uses `.env.development` environment variables
 
 #### Build for Production
 ```bash
@@ -85,7 +86,20 @@ npm run build
 - Compiles TypeScript to optimized JavaScript
 - Processes and optimizes all assets
 - Outputs to `dist/` folder
+- Uses `.env.production` environment variables
 - Ready for deployment
+
+#### Build for Development
+```bash
+npm run build:dev
+```
+- Same as `npm run build` but uses development environment variables
+
+#### Build for Production (Explicit)
+```bash
+npm run build:prod
+```
+- Same as `npm run build` but explicitly uses production environment variables
 
 #### Preview Production Build
 ```bash
@@ -103,6 +117,58 @@ npx swa start
 - Simulates Azure Static Web Apps environment
 - Includes routing, authentication, and API simulation
 - Uses configuration from `swa-cli.config.json`
+
+## ⚙️ Environment Configuration
+
+The application uses environment variables to configure the API URL and other settings.
+
+### Environment Files
+
+The project supports multiple environment files:
+
+```
+.env                    # Default values (committed)
+.env.development        # Development overrides (committed)
+.env.production         # Production overrides (committed)
+.env.local              # Local overrides (not committed)
+.env.local.example      # Local template (committed)
+```
+
+### Available Environment Variables
+
+#### `GUID_API_URL`
+- **Description**: The base URL for the GUID API
+- **Default**: `https://api.guid.codes`
+- **Example**: `https://api-staging.guid.codes` or `http://localhost:7071`
+
+### Setting Environment Variables
+
+#### For Local Development
+1. Copy the example file:
+   ```bash
+   cp .env.local.example .env.local
+   ```
+
+2. Edit `.env.local` with your values:
+   ```env
+   GUID_API_URL=http://localhost:7071
+   ```
+
+#### For Different Environments
+- **Development**: Edit `.env.development`
+- **Production**: Edit `.env.production`
+- **CI/CD**: Set environment variables in your build pipeline
+
+#### Build-Time Configuration
+You can also set environment variables when building:
+
+```bash
+# Windows (PowerShell)
+$env:GUID_API_URL="https://api-staging.guid.codes"; npm run build
+
+# Linux/macOS
+GUID_API_URL="https://api-staging.guid.codes" npm run build
+```
 
 ## 📦 Build Process
 
@@ -126,8 +192,8 @@ dist/
 ├── 404.html                      # Error page
 ├── about.html                    # About page
 ├── assets/
-│   └── main-[hash].js           # Bundled and optimized JavaScript
-├── css/theme.css                # Stylesheets
+│   ├── main-[hash].js           # Bundled and optimized JavaScript
+│   └── main-[hash].css          # Bundled and optimized CSS
 └── *.png, *.ico, etc.           # Static assets
 ```
 
@@ -208,9 +274,9 @@ To deploy manually:
 
 - **TypeScript**: Use strict typing for better code quality
 - **Assets**: Place static files in `public/` for automatic copying
-- **Styling**: CSS files in `public/css/` are copied as-is
+- **Styling**: CSS files imported in TypeScript are bundled and minified
 - **JavaScript**: Reference TypeScript source directly in HTML (`src/index.ts`)
-- **Hot Reload**: Changes to TypeScript and HTML reload automatically
+- **Hot Reload**: Changes to TypeScript, CSS, and HTML reload automatically
 
 ## 🔄 Migration from Previous Setup
 
