@@ -62,12 +62,14 @@ function fallbackCopyTextToClipboard(text: string): void {
 }
 
 /**
- * Copies the current GUID to clipboard
+ * Copies text to clipboard from a specified element or the current GUID element
+ * @param elementId - Optional ID of the element containing text to copy
  */
-function copyTextToClipboard(): void {
-    const guidElement = document.getElementById('newGuid') as HTMLInputElement;
+function copyTextToClipboard(elementId?: string): void {
+    const targetElementId = elementId || 'newGuid';
+    const guidElement = document.getElementById(targetElementId) as HTMLInputElement;
     if (!guidElement) {
-        console.error('GUID element not found');
+        console.error(`Element with id '${targetElementId}' not found`);
         return;
     }
     
@@ -91,6 +93,18 @@ function copyTextToClipboard(): void {
 window.addEventListener("load", (): void => {
     renewElements();
 });
+
+// Make functions globally available for onclick handlers
+declare global {
+    interface Window {
+        renewElements: () => void;
+        copyTextToClipboard: (elementId?: string) => void;
+    }
+}
+
+// Attach functions to window object so they can be called from HTML
+window.renewElements = renewElements;
+window.copyTextToClipboard = copyTextToClipboard;
 
 // Export functions for potential testing or external use
 export { fetchNewGuid, renewElements, copyTextToClipboard, fallbackCopyTextToClipboard };
