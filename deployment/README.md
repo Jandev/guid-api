@@ -20,7 +20,9 @@ The deployment creates:
   - Frontend: Vite TypeScript application (`/src` → `/dist`)
   - API: .NET 8 Azure Functions (`/api`)
   - GitHub Actions workflow for CI/CD
-  - Free or Standard tier options
+  - Standard tier with custom domain support
+  - Custom domain: `guid.codes` (configurable)
+  - Automatic SSL certificate provisioning
 
 ## 📋 Prerequisites
 
@@ -98,6 +100,45 @@ az deployment group create \
     branch="main"
 ```
 
+## 🌐 Custom Domain Configuration
+
+This deployment includes automatic configuration for the custom domain `guid.codes`.
+
+### Requirements
+
+- **Standard SKU**: Custom domains require Azure Static Web Apps Standard tier
+- **Domain ownership**: You must own and control the DNS for `guid.codes`
+- **DNS access**: Ability to create CNAME records
+
+### Automatic Setup
+
+The GitHub Actions workflow automatically:
+
+1. ✅ Deploys Static Web App with Standard SKU
+2. ✅ Configures custom domain (`guid.codes`)
+3. ✅ Sets up SSL certificate provisioning
+4. ✅ Provides DNS configuration instructions
+
+### DNS Configuration Required
+
+After deployment, create a CNAME record:
+
+```
+Type: CNAME
+Name: @ (or guid.codes)
+Target: [your-static-web-app].azurestaticapps.net
+```
+
+**Note**: The exact target hostname will be provided in the deployment output.
+
+### SSL Certificate
+
+- **Automatic provisioning**: Azure handles SSL certificate creation and renewal
+- **No manual intervention**: Certificate automatically renews
+- **Modern encryption**: Supports TLS 1.2 and 1.3
+
+For detailed setup instructions, see [`../docs/CUSTOM-DOMAIN.md`](../docs/CUSTOM-DOMAIN.md).
+
 ## ⚙️ Configuration Parameters
 
 | Parameter | Required | Default | Description |
@@ -107,7 +148,10 @@ az deployment group create \
 | `repositoryUrl` | Yes | - | GitHub repository URL |
 | `repositoryToken` | Yes | - | GitHub Personal Access Token |
 | `branch` | No | `"main"` | Git branch to deploy |
-| `sku` | No | `"Free"` | Pricing tier (Free/Standard) |
+| `sku` | No | `"Standard"` | Pricing tier (Standard required for custom domains) |
+| `customDomainName` | No | `"guid.codes"` | Custom domain name |
+| `enableCustomDomain` | No | `true` | Enable custom domain configuration |
+| `validationMethod` | No | `"cname-delegation"` | Domain validation method |
 | `stagingEnvironmentPolicy` | No | `"Enabled"` | Allow staging environments |
 
 ### Build Properties

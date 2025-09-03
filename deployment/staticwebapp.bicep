@@ -19,7 +19,20 @@ param branch string = 'main'
   'Free'
   'Standard'
 ])
-param sku string = 'Free'
+param sku string = 'Standard'
+
+@description('Custom domain name for the static web app')
+param customDomainName string = 'guid.codes'
+
+@description('Whether to configure custom domain')
+param enableCustomDomain bool = true
+
+@description('Custom domain validation method')
+@allowed([
+  'cname-delegation'
+  'dns-txt-token'
+])
+param validationMethod string = 'cname-delegation'
 
 @description('Tags to apply to all resources')
 param tags object = {
@@ -92,6 +105,15 @@ resource staticWebAppFunctionSettings 'Microsoft.Web/staticSites/config@2022-03-
   properties: functionAppSettings
 }
 
+// Configure custom domain (requires Standard SKU)
+resource staticWebAppCustomDomain 'Microsoft.Web/staticSites/customDomains@2022-03-01' = if (enableCustomDomain && sku == 'Standard') {
+  parent: staticWebApp
+  name: customDomainName
+  properties: {
+    validationMethod: validationMethod
+  }
+}
+
 @description('The resource ID of the static web app')
 output staticWebAppId string = staticWebApp.id
 
@@ -116,31 +138,47 @@ output customDomains array = staticWebApp.properties.customDomains
 @description('The content distribution endpoint for the static site')
 output contentDistributionEndpoint string = staticWebApp.properties.contentDistributionEndpoint
 
+@description('Custom domain configuration')
+output customDomain object = enableCustomDomain && sku == 'Standard' ? {
+  domainName: customDomainName
+  validationMethod: validationMethod
+  status: 'Configured (check Azure portal for status)'
+} : {
+  domainName: 'Not configured (requires Standard SKU)'
+  validationMethod: 'N/A'
+  status: 'Not configured'
+}
+
+@description('DNS configuration instructions')
+output dnsInstructions string = enableCustomDomain && sku == 'Standard' ? 'Create a CNAME record: ${customDomainName} -> ${staticWebApp.properties.defaultHostname}' : 'Custom domain not configured (requires Standard SKU and enableCustomDomain=true)'
+
 @description('Deployment instructions')
 output deploymentInstructions string = '''
-To deploy this Static Web App:
+To deploy this Static Web App with custom domain:
 
 1. Set the required parameters:
    - staticWebAppName: Name for your static web app (default: guid-api-swa)
    - repositoryUrl: Your GitHub repository URL
    - repositoryToken: GitHub Personal Access Token with repo permissions
    - branch: Git branch to deploy from (default: main)
+   - sku: Use "Standard" for custom domain support
+   - customDomainName: Your custom domain (e.g., guid.codes)
+   - enableCustomDomain: Set to true to configure custom domain
 
 2. Deploy using Azure CLI:
-   az deployment group create --resource-group <your-resource-group> --template-file staticwebapp.bicep --parameters repositoryUrl=<your-repo-url> repositoryToken=<your-token>
+   az deployment group create --resource-group <your-resource-group> --template-file staticwebapp.bicep --parameters repositoryUrl=<your-repo-url> repositoryToken=<your-token> sku=Standard customDomainName=guid.codes
 
-3. Or deploy using Azure PowerShell:
-   New-AzResourceGroupDeployment -ResourceGroupName <your-resource-group> -TemplateFile staticwebapp.bicep -repositoryUrl <your-repo-url> -repositoryToken <your-token>
+3. Configure DNS:
+   - For CNAME delegation: Create CNAME record pointing your domain to the default hostname
+   - For TXT validation: Create TXT record with the validation token
 
 4. The deployment will:
-   - Create the Azure Static Web App resource
+   - Create the Azure Static Web App resource (Standard SKU)
    - Configure build properties for Vite frontend (/src -> /dist)
    - Configure .NET 8 Azure Functions API (/api)
+   - Set up custom domain (guid.codes)
+   - Configure SSL certificate automatically
    - Set up GitHub Actions workflow automatically
-   - Configure app settings for proper runtime
 
-Note: Make sure your repository structure matches:
-- Frontend source: /src
-- API source: /api  
-- Build output: /dist
+Note: Custom domains require Standard SKU and proper DNS configuration.
 '''

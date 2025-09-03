@@ -13,6 +13,8 @@ env:
   AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP || 'rg-guid-api' }}
   AZURE_STATIC_WEB_APP_NAME: ${{ vars.AZURE_STATIC_WEB_APP_NAME || 'guid-api-swa' }}
   AZURE_LOCATION: ${{ vars.AZURE_LOCATION || 'westeurope' }}
+  CUSTOM_DOMAIN_NAME: ${{ vars.CUSTOM_DOMAIN_NAME || 'guid.codes' }}
+  ENABLE_CUSTOM_DOMAIN: ${{ vars.ENABLE_CUSTOM_DOMAIN || 'true' }}
 
 jobs:
   infrastructure:
@@ -43,6 +45,9 @@ jobs:
             repositoryUrl=${{ github.server_url }}/${{ github.repository }}
             repositoryToken=${{ secrets.GITHUB_TOKEN }}
             branch=${{ github.ref_name }}
+            sku=Standard
+            customDomainName=${{ env.CUSTOM_DOMAIN_NAME }}
+            enableCustomDomain=${{ env.ENABLE_CUSTOM_DOMAIN }}
             tags='{"Environment":"${{ github.ref_name == 'main' && 'Production' || 'Development' }}","Repository":"${{ github.repository }}","Branch":"${{ github.ref_name }}"}'
 
       - name: Get Static Web App Deployment Token
@@ -106,8 +111,13 @@ jobs:
         run: |
           echo "🎉 Deployment completed successfully!"
           echo "🌐 Application URL: ${{ needs.infrastructure.outputs.static-web-app-url }}"
+          echo "🌍 Custom Domain: https://${{ env.CUSTOM_DOMAIN_NAME }}"
           echo "📋 Static Web App: ${{ env.AZURE_STATIC_WEB_APP_NAME }}"
           echo "📁 Resource Group: ${{ env.AZURE_RESOURCE_GROUP }}"
+          echo ""
+          echo "🔧 DNS Configuration Required:"
+          echo "Create a CNAME record: ${{ env.CUSTOM_DOMAIN_NAME }} -> [Check Azure portal for target]"
+          echo "💡 Note: SSL certificate will be automatically provisioned after DNS validation"
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'

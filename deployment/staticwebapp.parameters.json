@@ -18,7 +18,16 @@
       "value": "main"
     },
     "sku": {
-      "value": "Free"
+      "value": "Standard"
+    },
+    "customDomainName": {
+      "value": "guid.codes"
+    },
+    "enableCustomDomain": {
+      "value": true
+    },
+    "validationMethod": {
+      "value": "cname-delegation"
     },
     "tags": {
       "value": {
