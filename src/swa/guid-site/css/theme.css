@@ -1,0 +1,44 @@
+body {
+  font-family: "Raleway", sans-serif;
+}
+h2 {
+  letter-spacing: 1.4rem;
+}
+.error-label {
+  color: #ff3333;
+}
+@media (prefers-color-scheme: light) {
+  body {
+    background: #fff;
+    color: #333;
+  }
+  body,
+  a {
+    color: #333;
+  }
+  input {
+    background: #fff;
+    color: #333;
+    font-family: "Raleway", sans-serif;
+    border: 1px solid #333;
+  }
+  .error-label {
+    color: #882222;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #333;
+    color: #fff;
+  }
+  body,
+  a {
+    color: #fff;
+  }
+  input {
+    background: #333;
+    color: #fff;
+    font-family: "Raleway", sans-serif;
+    border: 1px solid #fff;
+  }
+}
