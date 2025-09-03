@@ -129,22 +129,50 @@ Response body:
 
 ## Deployment
 
-This project consists of 2 small applications.
+This project is deployed as an **Azure Static Web App** which provides:
 
-1. Static website
-2. API
+- **Integrated hosting** for both frontend and API
+- **Automatic CI/CD** via GitHub Actions
+- **Global distribution** with built-in CDN
+- **Staging environments** for pull requests
+- **Custom domains** and SSL certificates
 
-Either one is deployed whenever there is a change in their respecting folders of the  `main` branch in this repository.
+### Automated Deployment
 
-The static site will be deployed to an Azure Storage Account and uses the static site hosting feature.  
-The API is deployed to an Azure Function App.
+The project uses GitHub Actions to automatically:
 
-Both are, by default, deployed to multiple regions across the globe and an Azure Traffic Manager will make sure the site & API is used which has the best response times for the user.
+1. **Deploy Infrastructure**: Creates Azure Static Web App using Bicep templates
+2. **Build Application**: Compiles TypeScript and .NET code
+3. **Deploy to Azure**: Uploads built application to Azure Static Web Apps
+4. **Create Staging**: Sets up preview environments for pull requests
 
-For a succesful deployment, a secret needs to be added to the repository called `AZURE_DEV`. The contents of this secret should be the output of this command:
+### Required GitHub Secrets
 
-```azcli
-az ad sp create-for-rbac --name "guidapi" --role owner --sdk-auth
+For deployment to work, configure these secrets in your GitHub repository:
+
+| Secret | Description | How to Get |
+|--------|-------------|------------|
+| `AZURE_CREDENTIALS` | Service Principal JSON | `az ad sp create-for-rbac --name "github-actions-guid-api" --role "Contributor" --scopes "/subscriptions/{subscription-id}" --sdk-auth` |
+| `AZURE_SUBSCRIPTION_ID` | Azure subscription ID | `az account show --query id --output tsv` |
+
+### Manual Infrastructure Deployment
+
+You can also deploy infrastructure manually using the provided scripts:
+
+```bash
+# Using PowerShell
+cd deployment
+.\deploy-staticwebapp.ps1 -ResourceGroupName "rg-guid-api" -RepositoryUrl "https://github.com/Jandev/guid-api" -GitHubToken "your-token"
+
+# Using Bash
+cd deployment  
+./deploy-staticwebapp.sh --resource-group "rg-guid-api" --repository-url "https://github.com/Jandev/guid-api" --token "your-token"
 ```
 
-Or something similar of course. The contents are used in the workflows to log in to Azure and deploy the resources.
+### Configuration
+
+- **GitHub Variables** (optional): Set `AZURE_RESOURCE_GROUP`, `AZURE_STATIC_WEB_APP_NAME`, `AZURE_LOCATION` to customize deployment
+- **Build Configuration**: Defined in `staticwebapp.config.json` and Bicep template
+- **API Settings**: Configured automatically for .NET 8 isolated functions
+
+For detailed setup instructions, see [`.github/SETUP.md`](.github/SETUP.md).
