@@ -14,15 +14,25 @@ $attempt = 0
 
 while (-not $apiReady -and $attempt -lt $maxAttempts) {
     try {
-        $response = Invoke-WebRequest -Uri "http://localhost:7071/api/live" -Method GET -TimeoutSec 2 -ErrorAction SilentlyContinue
+        # Use longer timeout and more robust settings
+        $response = Invoke-WebRequest -Uri "http://localhost:7071/api/live" -Method GET -TimeoutSec 10 -UseBasicParsing -ErrorAction Stop
         if ($response.StatusCode -eq 200) {
             $apiReady = $true
-            Write-Host "✅ API is ready!" -ForegroundColor Green
+            Write-Host "✅ API is ready! (Status: $($response.StatusCode))" -ForegroundColor Green
+        } else {
+            $attempt++
+            Write-Host "API returned status $($response.StatusCode), attempt $attempt/$maxAttempts..." -ForegroundColor Yellow
+            Start-Sleep -Seconds 2
         }
+    }
+    catch [System.Net.WebException] {
+        $attempt++
+        Write-Host "Connection error, attempt $attempt/$maxAttempts... (API might be starting up)" -ForegroundColor Yellow
+        Start-Sleep -Seconds 3
     }
     catch {
         $attempt++
-        Write-Host "API not ready yet, attempt $attempt/$maxAttempts..." -ForegroundColor Yellow
+        Write-Host "API not ready yet, attempt $attempt/$maxAttempts... ($($_.Exception.Message))" -ForegroundColor Yellow
         Start-Sleep -Seconds 2
     }
 }
