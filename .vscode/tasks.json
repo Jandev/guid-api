@@ -22,6 +22,32 @@
 				"showReuseMessage": true,
 				"clear": false
 			}
+		},
+		{
+			"label": "Build TypeScript",
+			"type": "shell",
+			"command": "npx",
+			"args": [
+				"tsc"
+			],
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Watch TypeScript",
+			"type": "shell",
+			"command": "npx",
+			"args": [
+				"tsc",
+				"--watch"
+			],
+			"isBackground": true,
+			"problemMatcher": [
+				"$tsc-watch"
+			],
+			"group": "build"
 		}
 	]
 }

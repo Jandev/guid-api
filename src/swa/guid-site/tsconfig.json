@@ -2,16 +2,17 @@
   "compilerOptions": {
     "target": "ES2022",
     "useDefineForClassFields": true,
-    "module": "ESNext",
+    "module": "ES2022",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
 
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
+    /* Output settings */
+    "outDir": "./js",
+    "rootDir": "./src",
+    "moduleResolution": "node",
+    "verbatimModuleSyntax": false,
     "moduleDetection": "force",
-    "noEmit": true,
+    "noEmit": false,
 
     /* Linting */
     "strict": true,
