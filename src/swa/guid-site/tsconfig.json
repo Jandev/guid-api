@@ -7,12 +7,10 @@
     "skipLibCheck": true,
 
     /* Output settings */
-    "outDir": "./js",
-    "rootDir": "./src",
+    "noEmit": true,
     "moduleResolution": "node",
     "verbatimModuleSyntax": false,
     "moduleDetection": "force",
-    "noEmit": false,
 
     /* Linting */
     "strict": true,
