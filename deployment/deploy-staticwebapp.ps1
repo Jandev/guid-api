@@ -64,19 +64,14 @@ Write-Host "🔍 Checking resource group: $ResourceGroupName" -ForegroundColor Y
 $rgExists = az group exists --name $ResourceGroupName --output tsv
 
 if ($rgExists -eq "false") {
-    Write-Host "📦 Creating resource group: $ResourceGroupName in $Location" -ForegroundColor Yellow
-    az group create --name $ResourceGroupName --location $Location --output none
-    if ($LASTEXITCODE -ne 0) {
-        Write-Error "❌ Failed to create resource group"
-        exit 1
-    }
-    Write-Host "✅ Resource group created successfully" -ForegroundColor Green
+    Write-Host "📦 Resource group will be created by Bicep template" -ForegroundColor Yellow
 } else {
-    Write-Host "✅ Resource group already exists" -ForegroundColor Green
+    Write-Host "✅ Resource group already exists and will be updated" -ForegroundColor Green
 }
 
 # Prepare deployment parameters
 $deploymentParams = @{
+    resourceGroupName = $ResourceGroupName
     staticWebAppName = $StaticWebAppName
     location = $Location
     repositoryUrl = $RepositoryUrl
@@ -122,9 +117,9 @@ $deploymentName = "staticwebapp-deployment-$(Get-Date -Format 'yyyyMMdd-HHmmss')
 try {
     Write-Host "⏳ Deploying Bicep template..." -ForegroundColor Yellow
     
-    $deployment = az deployment group create `
-        --resource-group $ResourceGroupName `
+    $deployment = az deployment sub create `
         --name $deploymentName `
+        --location $Location `
         --template-file $bicepFile `
         --parameters $paramString.Trim() `
         --output json | ConvertFrom-Json

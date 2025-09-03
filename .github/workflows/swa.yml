@@ -37,9 +37,11 @@ jobs:
         uses: azure/arm-deploy@v2
         with:
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
+          scope: subscription
+          region: ${{ env.AZURE_LOCATION }}
           template: ./deployment/staticwebapp.bicep
           parameters: >
+            resourceGroupName=${{ env.AZURE_RESOURCE_GROUP }}
             staticWebAppName=${{ env.AZURE_STATIC_WEB_APP_NAME }}
             location=${{ env.AZURE_LOCATION }}
             repositoryUrl=${{ github.server_url }}/${{ github.repository }}

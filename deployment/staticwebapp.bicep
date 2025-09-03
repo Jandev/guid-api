@@ -1,8 +1,13 @@
+targetScope = 'subscription'
+
+@description('The name of the resource group')
+param resourceGroupName string = 'rg-guid-api'
+
 @description('The name of the static web app')
 param staticWebAppName string = 'guid-api-swa'
 
 @description('Location for all resources')
-param location string = resourceGroup().location
+param location string = 'westeurope'
 
 @description('The repository URL')
 param repositoryUrl string = ''
@@ -69,88 +74,64 @@ param functionAppSettings object = {
   DOTNET_FRAMEWORK_VERSION: 'v8.0'
 }
 
-// Create the Static Web App
-resource staticWebApp 'Microsoft.Web/staticSites@2024-04-01' = {
-  name: staticWebAppName
+// Create the resource group
+resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+  name: resourceGroupName
   location: location
   tags: tags
-  sku: {
-    name: sku
-    tier: sku
-  }
-  properties: {
+}
+
+// Deploy the Static Web App into the resource group
+module staticWebAppDeployment 'staticwebapp-resources.bicep' = {
+  name: 'staticWebAppDeployment'
+  scope: resourceGroup
+  params: {
+    staticWebAppName: staticWebAppName
+    location: location
     repositoryUrl: repositoryUrl
     repositoryToken: repositoryToken
     branch: branch
-    buildProperties: buildProperties
-    stagingEnvironmentPolicy: stagingEnvironmentPolicy
-    allowConfigFileUpdates: true
-    enterpriseGradeCdnStatus: 'Disabled'
-    publicNetworkAccess: 'Enabled'
-    provider: 'GitHub'
-  }
-}
-
-// Configure app settings for the static web app
-resource staticWebAppSettings 'Microsoft.Web/staticSites/config@2022-03-01' = {
-  parent: staticWebApp
-  name: 'appsettings'
-  properties: appSettings
-}
-
-// Configure function app settings for the API
-resource staticWebAppFunctionSettings 'Microsoft.Web/staticSites/config@2022-03-01' = {
-  parent: staticWebApp
-  name: 'functionappsettings'
-  properties: functionAppSettings
-}
-
-// Configure custom domain (requires Standard SKU)
-resource staticWebAppCustomDomain 'Microsoft.Web/staticSites/customDomains@2022-03-01' = if (enableCustomDomain && sku == 'Standard') {
-  parent: staticWebApp
-  name: customDomainName
-  properties: {
+    sku: sku
+    customDomainName: customDomainName
+    enableCustomDomain: enableCustomDomain
     validationMethod: validationMethod
+    tags: tags
+    stagingEnvironmentPolicy: stagingEnvironmentPolicy
+    buildProperties: buildProperties
+    appSettings: appSettings
+    functionAppSettings: functionAppSettings
   }
 }
 
 @description('The resource ID of the static web app')
-output staticWebAppId string = staticWebApp.id
+output staticWebAppId string = staticWebAppDeployment.outputs.staticWebAppId
 
 @description('The name of the static web app')
-output staticWebAppName string = staticWebApp.name
+output staticWebAppName string = staticWebAppDeployment.outputs.staticWebAppName
 
 @description('The default hostname of the static web app')
-output defaultHostname string = staticWebApp.properties.defaultHostname
+output defaultHostname string = staticWebAppDeployment.outputs.defaultHostname
 
 @description('The repository URL')
-output repositoryUrl string = staticWebApp.properties.repositoryUrl
+output repositoryUrl string = staticWebAppDeployment.outputs.repositoryUrl
 
 @description('The resource group name')
-output resourceGroupName string = resourceGroup().name
+output resourceGroupName string = resourceGroup.name
 
 @description('The location where the resources were deployed')
 output location string = location
 
 @description('The custom domains associated with the static web app')
-output customDomains array = staticWebApp.properties.customDomains
+output customDomains array = staticWebAppDeployment.outputs.customDomains
 
 @description('The content distribution endpoint for the static site')
-output contentDistributionEndpoint string = staticWebApp.properties.contentDistributionEndpoint
+output contentDistributionEndpoint string = staticWebAppDeployment.outputs.contentDistributionEndpoint
 
 @description('Custom domain configuration')
-output customDomain object = enableCustomDomain && sku == 'Standard' ? {
-  domainName: customDomainName
-  validationMethod: validationMethod
-  status: 'Configured (check Azure portal for status)'
-} : {
-  domainName: 'Not configured (requires Standard SKU)'
-  validationMethod: 'N/A'
-  status: 'Not configured'
-}
+output customDomain object = staticWebAppDeployment.outputs.customDomain
 
 @description('DNS configuration instructions')
-output dnsInstructions string = enableCustomDomain && sku == 'Standard' ? 'Create a CNAME record: ${customDomainName} -> ${staticWebApp.properties.defaultHostname}' : 'Custom domain not configured (requires Standard SKU and enableCustomDomain=true)'
+output dnsInstructions string = staticWebAppDeployment.outputs.dnsInstructions
 
 @description('Deployment instructions')
 output deploymentInstructions string = '''

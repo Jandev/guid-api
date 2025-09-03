@@ -125,11 +125,9 @@ echo "📋 Using subscription: $CURRENT_SUB ($CURRENT_SUB_ID)"
 # Check if resource group exists
 echo "🔍 Checking resource group: $RESOURCE_GROUP"
 if ! az group exists --name "$RESOURCE_GROUP" --output tsv | grep -q "true"; then
-    echo "📦 Creating resource group: $RESOURCE_GROUP in $LOCATION"
-    az group create --name "$RESOURCE_GROUP" --location "$LOCATION" --output none
-    echo "✅ Resource group created successfully"
+    echo "📦 Resource group will be created by Bicep template"
 else
-    echo "✅ Resource group already exists"
+    echo "✅ Resource group already exists and will be updated"
 fi
 
 # Get script directory to find Bicep file
@@ -159,11 +157,12 @@ DEPLOYMENT_NAME="staticwebapp-deployment-$(date +%Y%m%d-%H%M%S)"
 # Deploy the Bicep template
 echo "⏳ Deploying Bicep template..."
 
-DEPLOYMENT_OUTPUT=$(az deployment group create \
-    --resource-group "$RESOURCE_GROUP" \
+DEPLOYMENT_OUTPUT=$(az deployment sub create \
     --name "$DEPLOYMENT_NAME" \
+    --location "$LOCATION" \
     --template-file "$BICEP_FILE" \
     --parameters \
+        resourceGroupName="$RESOURCE_GROUP" \
         staticWebAppName="$SWA_NAME" \
         location="$LOCATION" \
         repositoryUrl="$REPOSITORY_URL" \

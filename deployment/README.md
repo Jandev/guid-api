@@ -56,9 +56,9 @@ The deployment creates:
 # Navigate to deployment folder
 cd deployment
 
-# Run deployment script
+# Run deployment script (with subscription-level deployment)
 .\deploy-staticwebapp.ps1 `
-  -ResourceGroupName "my-resource-group" `
+  -ResourceGroupName "rg-guid-api" `
   -RepositoryUrl "https://github.com/your-username/guid-api" `
   -GitHubToken "ghp_your_github_token_here" `
   -StaticWebAppName "my-guid-api" `
@@ -74,9 +74,9 @@ cd deployment
 # Make script executable
 chmod +x deploy-staticwebapp.sh
 
-# Run deployment script
+# Run deployment script (with subscription-level deployment)
 ./deploy-staticwebapp.sh \
-  --resource-group "my-resource-group" \
+  --resource-group "rg-guid-api" \
   --repository-url "https://github.com/your-username/guid-api" \
   --token "ghp_your_github_token_here" \
   --name "my-guid-api" \
@@ -86,14 +86,13 @@ chmod +x deploy-staticwebapp.sh
 ### Option 3: Manual Azure CLI Deployment
 
 ```bash
-# Create resource group (if it doesn't exist)
-az group create --name "my-resource-group" --location "eastus2"
-
-# Deploy the Bicep template
-az deployment group create \
-  --resource-group "my-resource-group" \
+# Deploy at subscription level (creates resource group automatically)
+az deployment sub create \
+  --name "guid-api-deployment" \
+  --location "eastus2" \
   --template-file staticwebapp.bicep \
   --parameters \
+    resourceGroupName="rg-guid-api" \
     staticWebAppName="my-guid-api" \
     repositoryUrl="https://github.com/your-username/guid-api" \
     repositoryToken="ghp_your_github_token_here" \
