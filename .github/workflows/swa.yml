@@ -22,7 +22,7 @@ env:
 
 jobs:
   infrastructure:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Deploy Infrastructure
     outputs:
@@ -56,7 +56,7 @@ jobs:
             location=${{ env.AZURE_LOCATION }}
             repositoryUrl=${{ github.server_url }}/${{ github.repository }}
             repositoryToken=${{ secrets.DEPLOYMENT_PAT }}
-            branch=${{ github.ref_name }}
+            branch=${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
             sku=Standard
             customDomainName=${{ env.CUSTOM_DOMAIN_NAME }}
             enableCustomDomain=${{ env.ENABLE_CUSTOM_DOMAIN }}
@@ -100,7 +100,7 @@ jobs:
 
   build_and_deploy:
     needs: infrastructure
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Application
     steps:
