@@ -4,15 +4,15 @@ param staticWebAppName string
 @description('Location for all resources')
 param location string
 
-@description('The repository URL')
-param repositoryUrl string
+@description('The repository URL - optional for infrastructure-only deployment')
+param repositoryUrl string = ''
 
-@description('The repository token for GitHub Actions')
+@description('The repository token for GitHub Actions - optional for infrastructure-only deployment')
 @secure()
-param repositoryToken string
+param repositoryToken string = ''
 
-@description('The branch name to deploy from')
-param branch string
+@description('The branch name to deploy from - optional for infrastructure-only deployment')
+param branch string = ''
 
 @description('The SKU name for the static web app')
 @allowed([
@@ -62,17 +62,22 @@ resource staticWebApp 'Microsoft.Web/staticSites@2024-04-01' = {
     name: sku
     tier: sku
   }
-  properties: {
-    repositoryUrl: repositoryUrl
-    repositoryToken: repositoryToken
-    branch: branch
-    buildProperties: buildProperties
-    stagingEnvironmentPolicy: stagingEnvironmentPolicy
-    allowConfigFileUpdates: true
-    enterpriseGradeCdnStatus: 'Disabled'
-    publicNetworkAccess: 'Enabled'
-    provider: 'GitHub'
-  }
+  properties: union(
+    {
+      buildProperties: buildProperties
+      stagingEnvironmentPolicy: stagingEnvironmentPolicy
+      allowConfigFileUpdates: true
+      enterpriseGradeCdnStatus: 'Disabled'
+      publicNetworkAccess: 'Enabled'
+    },
+    // Only include repository properties if they are provided (not empty)
+    !empty(repositoryUrl) ? {
+      repositoryUrl: repositoryUrl
+      repositoryToken: repositoryToken
+      branch: branch
+      provider: 'GitHub'
+    } : {}
+  )
 }
 
 // Configure app settings for the static web app

@@ -54,9 +54,6 @@ jobs:
             resourceGroupName=${{ env.AZURE_RESOURCE_GROUP }}
             staticWebAppName=${{ env.AZURE_STATIC_WEB_APP_NAME }}
             location=${{ env.AZURE_LOCATION }}
-            repositoryUrl=${{ github.server_url }}/${{ github.repository }}
-            repositoryToken=${{ secrets.DEPLOYMENT_PAT }}
-            branch=${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
             sku=Standard
             customDomainName=${{ env.CUSTOM_DOMAIN_NAME }}
             enableCustomDomain=${{ env.ENABLE_CUSTOM_DOMAIN }}

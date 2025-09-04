@@ -13,5 +13,8 @@
             "route": "/api/*",
             "allowedRoles": ["anonymous"]
         }
-    ]
+    ],
+    "platform": {
+        "apiRuntime": "dotnet"
+    }
 }

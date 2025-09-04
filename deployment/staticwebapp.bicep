@@ -9,15 +9,15 @@ param staticWebAppName string = 'guid-api-swa'
 @description('Location for all resources')
 param location string = 'westeurope'
 
-@description('The repository URL')
+@description('The repository URL - optional for infrastructure-only deployment')
 param repositoryUrl string = ''
 
-@description('The repository token for GitHub Actions')
+@description('The repository token for GitHub Actions - optional for infrastructure-only deployment')
 @secure()
 param repositoryToken string = ''
 
-@description('The branch name to deploy from')
-param branch string = 'main'
+@description('The branch name to deploy from - optional for infrastructure-only deployment')
+param branch string = ''
 
 @description('The SKU name for the static web app')
 @allowed([
