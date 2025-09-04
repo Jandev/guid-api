@@ -142,8 +142,12 @@ jobs:
           echo "📋 Static Web App: ${{ env.AZURE_STATIC_WEB_APP_NAME }}"
           echo "📁 Resource Group: ${{ env.AZURE_RESOURCE_GROUP }}"
           echo ""
-          echo "🔧 DNS Configuration Required:"
-          echo "Create a CNAME record: ${{ env.CUSTOM_DOMAIN_NAME }} -> [Check Azure portal for target]"
+          echo "🔧 DNS Configuration Required for APEX DOMAIN:"
+          echo "⚠️  IMPORTANT: Apex domains (like guid.codes) require TXT record validation"
+          echo "📝 Go to Azure portal → Static Web Apps → Custom domains"
+          echo "📝 Add custom domain '${{ env.CUSTOM_DOMAIN_NAME }}'"
+          echo "📝 Copy the TXT validation token"
+          echo "📝 Create TXT record: Name='@' or '${{ env.CUSTOM_DOMAIN_NAME }}', Value='[validation token]'"
           echo "💡 Note: SSL certificate will be automatically provisioned after DNS validation"
 
   close_pull_request_job:

@@ -32,12 +32,18 @@ param customDomainName string = 'guid.codes'
 @description('Whether to configure custom domain')
 param enableCustomDomain bool = true
 
-@description('Custom domain validation method')
+@description('Custom domain validation method - Note: Apex domains (like guid.codes) automatically use dns-txt-token regardless of this setting')
 @allowed([
   'cname-delegation'
   'dns-txt-token'
 ])
-param validationMethod string = 'cname-delegation'
+param validationMethod string = 'dns-txt-token'
+
+// Automatically determine if this is an apex domain (no subdomain)
+// Apex domains (like guid.codes) must use dns-txt-token validation
+// Subdomains (like www.guid.codes) can use cname-delegation
+var isApexDomain = length(split(customDomainName, '.')) == 2
+var actualValidationMethod = isApexDomain ? 'dns-txt-token' : validationMethod
 
 @description('Tags to apply to all resources')
 param tags object = {
@@ -94,7 +100,7 @@ module staticWebAppDeployment 'staticwebapp-resources.bicep' = {
     sku: sku
     customDomainName: customDomainName
     enableCustomDomain: enableCustomDomain
-    validationMethod: validationMethod
+    validationMethod: actualValidationMethod
     tags: tags
     stagingEnvironmentPolicy: stagingEnvironmentPolicy
     buildProperties: buildProperties
@@ -120,6 +126,17 @@ output resourceGroupName string = resourceGroup.name
 
 @description('The location where the resources were deployed')
 output location string = location
+
+@description('DNS configuration instructions based on domain type')
+output dnsInstructions string = isApexDomain 
+  ? 'APEX DOMAIN (${customDomainName}): Create a TXT record with name "@" or "${customDomainName}" and the validation token value from Azure portal. Apex domains must use DNS TXT validation.'
+  : 'SUBDOMAIN (${customDomainName}): Create a CNAME record pointing ${customDomainName} to ${staticWebAppDeployment.outputs.defaultHostname}'
+
+@description('Validation method used for custom domain')
+output validationMethod string = actualValidationMethod
+
+@description('Domain type detected')
+output domainType string = isApexDomain ? 'apex' : 'subdomain'
 
 @description('Deployment instructions')
 output deploymentInstructions string = '''
