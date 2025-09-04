@@ -1,5 +1,8 @@
 name: Azure Static Web Apps CI/CD
 
+# IMPORTANT: This workflow requires a DEPLOYMENT_PAT secret with admin permissions
+# See .github/SETUP.md for complete setup instructions
+
 on:
   push:
     branches:
@@ -51,7 +54,7 @@ jobs:
             staticWebAppName=${{ env.AZURE_STATIC_WEB_APP_NAME }}
             location=${{ env.AZURE_LOCATION }}
             repositoryUrl=${{ github.server_url }}/${{ github.repository }}
-            repositoryToken=${{ secrets.GITHUB_TOKEN }}
+            repositoryToken=${{ secrets.DEPLOYMENT_PAT }}
             branch=${{ github.ref_name }}
             sku=Standard
             customDomainName=${{ env.CUSTOM_DOMAIN_NAME }}

@@ -4,7 +4,7 @@ This document explains how to configure GitHub secrets and variables required fo
 
 ## 🔐 Required GitHub Secrets
 
-### 1. Azure Service Principal (`AZURE_CREDENTIALS`)
+### 1. Azure Service Principal (`AZURE_DEV`)
 
 Create an Azure Service Principal with Contributor permissions:
 
@@ -42,18 +42,37 @@ az account show --query id --output tsv
 
 Add this value as the `AZURE_SUBSCRIPTION_ID` secret.
 
-### 3. Static Web App API Token (`AZURE_STATIC_WEB_APPS_API_TOKEN`)
+### 3. GitHub Personal Access Token (`DEPLOYMENT_PAT`) ⚠️ **CRITICAL FOR AZURE STATIC WEB APPS**
 
-This will be automatically retrieved by the workflow after infrastructure deployment. However, for initial deployments or manual setup:
+**Why required**: Azure Static Web Apps needs admin permissions to:
+- Create and manage GitHub Actions workflows
+- Set up repository webhooks for automated deployments
+- Manage deployment keys and secrets
+- Configure branch protection rules (if enabled)
 
-```bash
-# Get the API token after Static Web App is created
-az staticwebapp secrets list \
-  --name "your-static-web-app-name" \
-  --resource-group "your-resource-group" \
-  --query "properties.apiKey" \
-  --output tsv
-```
+The default `GITHUB_TOKEN` has limited permissions and **will cause deployment to fail**.
+
+**How to create**:
+1. Go to GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
+2. Click "Generate new token (classic)"
+3. Set expiration (recommended: 90 days or 1 year)
+4. Select required scopes:
+   - ✅ `repo` (Full control of private repositories)
+   - ✅ `admin:repo_hook` (Full control of repository hooks) 
+   - ✅ `workflow` (Update GitHub Action workflows)
+5. Click "Generate token"
+6. Copy the token and add it as repository secret named `DEPLOYMENT_PAT`
+
+**Alternative - Fine-grained PATs (Beta)**:
+1. Go to GitHub Settings → Developer settings → Personal access tokens → Fine-grained tokens
+2. Click "Generate new token"
+3. Select repository: `Jandev/guid-api`
+4. Set repository permissions:
+   - ✅ Administration: Read and write
+   - ✅ Actions: Write
+   - ✅ Contents: Read and write
+   - ✅ Metadata: Read
+   - ✅ Pull requests: Write
 
 ## 📋 Optional GitHub Variables
 
@@ -84,8 +103,9 @@ az group create \
 2. Navigate to **Settings** → **Secrets and variables** → **Actions**
 3. Add the following secrets:
 
-   - **`AZURE_CREDENTIALS`**: Service principal JSON (from Step 1 above)
-   - **`AZURE_SUBSCRIPTION_ID`**: Your Azure subscription ID
+   - **`AZURE_DEV`**: Service principal JSON (from Step 1 above)
+   - **`AZURE_SUBSCRIPTION_ID`**: Your Azure subscription ID  
+   - **`DEPLOYMENT_PAT`**: Personal Access Token with admin permissions (⚠️ **REQUIRED**)
 
 ### Step 3: Configure GitHub Variables (Optional)
 
@@ -154,21 +174,27 @@ az staticwebapp show \
 
 ### Common Issues
 
-1. **Authentication Errors**
-   - Verify `AZURE_CREDENTIALS` secret is correctly formatted JSON
+1. **"RepositoryToken is invalid" Error** ⚠️
+   - **Most Common Cause**: Missing or incorrect `DEPLOYMENT_PAT` secret
+   - **Solution**: Create a Personal Access Token with `repo`, `admin:repo_hook`, and `workflow` permissions
+   - Verify the token hasn't expired
+   - Ensure the token belongs to a user with admin access to the repository
+
+2. **Authentication Errors**
+   - Verify `AZURE_DEV` secret is correctly formatted JSON
    - Ensure service principal has proper permissions
    - Check subscription ID is correct
 
-2. **Resource Group Not Found**
+3. **Resource Group Not Found**
    - Verify resource group exists in the specified subscription
    - Check `AZURE_RESOURCE_GROUP` variable/default value
 
-3. **Bicep Deployment Failures**
+4. **Bicep Deployment Failures**
    - Review GitHub Actions logs for specific error messages
    - Verify Bicep template syntax
    - Check Azure resource quotas and limits
 
-4. **Build Failures**
+5. **Build Failures**
    - Ensure `package.json` exists in repository root
    - Verify build scripts are correctly configured
    - Check Node.js version compatibility
