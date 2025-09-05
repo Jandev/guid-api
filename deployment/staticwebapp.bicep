@@ -61,10 +61,10 @@ param stagingEnvironmentPolicy string = 'Enabled'
 
 @description('Build properties for the static site')
 param buildProperties object = {
-  appLocation: '/src'
-  apiLocation: '/api'
-  outputLocation: '/dist'
-  skipGithubActionWorkflowGeneration: false
+  appLocation: 'src'
+  apiLocation: 'api'
+  outputLocation: 'dist'
+  skipGithubActionWorkflowGeneration: true
 }
 
 @description('App settings for the static web app')
