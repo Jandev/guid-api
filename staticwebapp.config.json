@@ -15,6 +15,7 @@
         }
     ],
     "platform": {
-        "apiRuntime": "dotnet-isolated:8.0"
+        "apiRuntime": "dotnet-isolated:8.0",
+        "appRuntime": "node:22"
     }
 }
