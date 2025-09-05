@@ -15,6 +15,6 @@
         }
     ],
     "platform": {
-        "apiRuntime": "dotnet"
+        "apiRuntime": "dotnet-isolated:8.0"
     }
 }
