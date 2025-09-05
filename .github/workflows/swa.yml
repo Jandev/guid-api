@@ -126,8 +126,8 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
           ###### Repository/Build Configurations ######
-          app_location: "src"
-          api_location: "api"
+          app_location: "/"
+          api_location: "/api"
           output_location: "dist"
           ###### End of Repository/Build Configurations ######
 
