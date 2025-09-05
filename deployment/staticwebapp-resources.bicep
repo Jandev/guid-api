@@ -113,4 +113,4 @@ output staticWebAppName string = staticWebApp.name
 output defaultHostname string = staticWebApp.properties.defaultHostname
 
 @description('The repository URL')
-output repositoryUrl string = staticWebApp.properties.repositoryUrl
+output repositoryUrl string = !empty(repositoryUrl) ? staticWebApp.properties.repositoryUrl : ''
