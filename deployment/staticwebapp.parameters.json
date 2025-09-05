@@ -45,7 +45,7 @@
     },
     "buildProperties": {
       "value": {
-        "appLocation": "/src",
+        "appLocation": "/",
         "apiLocation": "/api",
         "outputLocation": "/dist",
         "skipGithubActionWorkflowGeneration": false,
@@ -55,7 +55,7 @@
     },
     "appSettings": {
       "value": {
-        "WEBSITE_NODE_DEFAULT_VERSION": "18.x"
+        "WEBSITE_NODE_DEFAULT_VERSION": "22.x"
       }
     },
     "functionAppSettings": {
