@@ -134,6 +134,8 @@ jobs:
           NODE_VERSION: "22"
           PLATFORM_NAME: "nodejs"
           PLATFORM_VERSION: "22"
+          FUNCTIONS_WORKER_RUNTIME: "dotnet-isolated"
+          DOTNET_VERSION: "8.0.404"
 
       - name: Deployment Summary
         run: |
