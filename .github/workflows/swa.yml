@@ -130,6 +130,10 @@ jobs:
           api_location: "/api"
           output_location: "dist"
           ###### End of Repository/Build Configurations ######
+        env:
+          NODE_VERSION: "22"
+          PLATFORM_NAME: "nodejs"
+          PLATFORM_VERSION: "22"
 
       - name: Deployment Summary
         run: |
