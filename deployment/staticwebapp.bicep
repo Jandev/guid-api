@@ -24,7 +24,7 @@ param branch string = ''
   'Free'
   'Standard'
 ])
-param sku string = 'Standard'
+param sku string = 'Free'
 
 @description('Custom domain name for the static web app')
 param customDomainName string = 'guid.codes'
@@ -147,24 +147,24 @@ To deploy this Static Web App with custom domain:
    - repositoryUrl: Your GitHub repository URL
    - repositoryToken: GitHub Personal Access Token with repo permissions
    - branch: Git branch to deploy from (default: main)
-   - sku: Use "Standard" for custom domain support
+   - sku: Use "Free" or "Standard" (custom domains now supported on both)
    - customDomainName: Your custom domain (e.g., guid.codes)
    - enableCustomDomain: Set to true to configure custom domain
 
 2. Deploy using Azure CLI:
-   az deployment group create --resource-group <your-resource-group> --template-file staticwebapp.bicep --parameters repositoryUrl=<your-repo-url> repositoryToken=<your-token> sku=Standard customDomainName=guid.codes
+   az deployment group create --resource-group <your-resource-group> --template-file staticwebapp.bicep --parameters repositoryUrl=<your-repo-url> repositoryToken=<your-token> sku=Free customDomainName=guid.codes
 
 3. Configure DNS:
    - For CNAME delegation: Create CNAME record pointing your domain to the default hostname
    - For TXT validation: Create TXT record with the validation token
 
 4. The deployment will:
-   - Create the Azure Static Web App resource (Standard SKU)
+   - Create the Azure Static Web App resource (Free SKU by default)
    - Configure build properties for Vite frontend (/src -> /dist)
    - Configure .NET 8 Azure Functions API (/api)
    - Set up custom domain (guid.codes)
    - Configure SSL certificate automatically
    - Set up GitHub Actions workflow automatically
 
-Note: Custom domains require Standard SKU and proper DNS configuration.
+Note: Custom domains are now supported on both Free and Standard SKUs. Proper DNS configuration is required.
 '''

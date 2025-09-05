@@ -94,8 +94,8 @@ resource staticWebAppFunctionSettings 'Microsoft.Web/staticSites/config@2022-03-
   properties: functionAppSettings
 }
 
-// Configure custom domain (requires Standard SKU)
-resource staticWebAppCustomDomain 'Microsoft.Web/staticSites/customDomains@2022-03-01' = if (enableCustomDomain && sku == 'Standard') {
+// Configure custom domain (now supported on both Free and Standard SKUs)
+resource staticWebAppCustomDomain 'Microsoft.Web/staticSites/customDomains@2022-03-01' = if (enableCustomDomain) {
   parent: staticWebApp
   name: customDomainName
   properties: {

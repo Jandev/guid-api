@@ -54,7 +54,7 @@ jobs:
             resourceGroupName=${{ env.AZURE_RESOURCE_GROUP }}
             staticWebAppName=${{ env.AZURE_STATIC_WEB_APP_NAME }}
             location=${{ env.AZURE_LOCATION }}
-            sku=Standard
+            sku=Free
             customDomainName=${{ env.CUSTOM_DOMAIN_NAME }}
             enableCustomDomain=${{ env.ENABLE_CUSTOM_DOMAIN }}
 
