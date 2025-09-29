@@ -63,7 +63,7 @@ jobs:
         run: |
           echo "Waiting for Static Web App to be fully provisioned..."
           sleep 30
-          
+
           # Get the deployment token from the Static Web App
           echo "Retrieving Static Web App deployment token..."
           SWA_TOKEN=$(az staticwebapp secrets list \
@@ -71,14 +71,14 @@ jobs:
             --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
             --query "properties.apiKey" \
             --output tsv)
-          
+
           if [ -z "$SWA_TOKEN" ]; then
             echo "Error: Failed to retrieve Static Web App token"
             exit 1
           fi
-          
+
           echo "deployment-token=$SWA_TOKEN" >> $GITHUB_OUTPUT
-          
+
           # Get the default hostname
           echo "Retrieving Static Web App hostname..."
           SWA_URL=$(az staticwebapp show \
@@ -86,12 +86,12 @@ jobs:
             --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
             --query "defaultHostname" \
             --output tsv)
-          
+
           if [ -z "$SWA_URL" ]; then
             echo "Error: Failed to retrieve Static Web App hostname"
             exit 1
           fi
-          
+
           echo "static-web-app-url=https://$SWA_URL" >> $GITHUB_OUTPUT
           echo "✅ Successfully retrieved Static Web App details"
 
@@ -108,9 +108,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: 'package.json'
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: "package.json"
 
       - name: Install dependencies
         run: npm install
@@ -126,17 +126,11 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
           ###### Repository/Build Configurations ######
-          app_location: "/"
-          api_location: "/api"
-          output_location: "dist"
+          app_location: "dist"
+          api_location: "api-dist"
           ###### End of Repository/Build Configurations ######
-        env:
-          NODE_VERSION: "22"
-          PLATFORM_NAME: "nodejs"
-          PLATFORM_VERSION: "22"
-          FUNCTIONS_WORKER_RUNTIME: "dotnet-isolated"
-          DOTNET_VERSION: "8.0.404"
-
+          skip_app_build: true
+          skip_api_build: true
       - name: Deployment Summary
         run: |
           echo "🎉 Deployment completed successfully!"
@@ -172,7 +166,7 @@ jobs:
             --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
             --query "properties.apiKey" \
             --output tsv 2>/dev/null) || echo ""
-          
+
           if [ -z "$SWA_TOKEN" ]; then
             echo "Warning: Could not retrieve Static Web App token. Resource may not exist."
             echo "deployment-token=SKIP" >> $GITHUB_OUTPUT
@@ -188,3 +182,4 @@ jobs:
           azure_static_web_apps_api_token: ${{ steps.get-swa-token.outputs.deployment-token }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "close"
+          app_location: "app"
