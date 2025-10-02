@@ -11,11 +11,12 @@
     "routes": [
         {
             "route": "/api/*",
-            "allowedRoles": ["anonymous"]
+            "allowedRoles": [
+                "anonymous"
+            ]
         }
     ],
     "platform": {
-        "apiRuntime": "dotnet-isolated:8.0",
-        "appRuntime": "node:22"
+        "apiRuntime": "dotnet-isolated:8.0"
     }
 }
