@@ -1,0 +1,22 @@
+{
+    "navigationFallback": {
+        "rewrite": "/index.html"
+    },
+    "responseOverrides": {
+        "404": {
+            "rewrite": "/404.html",
+            "statusCode": 404
+        }
+    },
+    "routes": [
+        {
+            "route": "/api/*",
+            "allowedRoles": [
+                "anonymous"
+            ]
+        }
+    ],
+    "platform": {
+        "apiRuntime": "dotnet-isolated:8.0"
+    }
+}
